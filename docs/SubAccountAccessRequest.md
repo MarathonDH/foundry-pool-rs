@@ -1,0 +1,11 @@
+# SubAccountAccessRequest
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**user_sub_account_access** | [**Vec<models::UserSubAccountAccessRequest>**](UserSubAccountAccessRequest.md) |  | 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
