@@ -84,4 +84,3 @@ pub mod worker_response;
 pub use self::worker_response::WorkerResponse;
 pub mod workers_response;
 pub use self::workers_response::WorkersResponse;
-pub use std::string::String;

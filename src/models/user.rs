@@ -26,22 +26,18 @@ pub struct User {
     pub created_at: String,
     #[serde(rename = "updatedAt")]
     pub updated_at: String,
-    #[serde(rename = "userRole")]
-    pub user_role: Box<models::UserRole>,
     #[serde(rename = "group")]
     pub group: Box<models::Group>,
     #[serde(rename = "groups")]
     pub groups: Vec<models::UserGroup>,
     #[serde(rename = "authId")]
     pub auth_id: String,
-    #[serde(rename = "defaultSubAccountRole")]
-    pub default_sub_account_role: Box<models::UserSubAccountRole>,
     #[serde(rename = "adminRole")]
     pub admin_role: Box<models::AdminRole>,
 }
 
 impl User {
-    pub fn new(id: i32, email_address: String, full_name: String, preferred_name: String, is_active: bool, created_at: String, updated_at: String, user_role: models::UserRole, group: models::Group, groups: Vec<models::UserGroup>, auth_id: String, default_sub_account_role: models::UserSubAccountRole, admin_role: models::AdminRole) -> User {
+    pub fn new(id: i32, email_address: String, full_name: String, preferred_name: String, is_active: bool, created_at: String, updated_at: String, group: models::Group, groups: Vec<models::UserGroup>, auth_id: String, admin_role: models::AdminRole) -> User {
         User {
             id,
             email_address,
@@ -50,11 +46,9 @@ impl User {
             is_active,
             created_at,
             updated_at,
-            user_role: Box::new(user_role),
             group: Box::new(group),
             groups,
             auth_id,
-            default_sub_account_role: Box::new(default_sub_account_role),
             admin_role: Box::new(admin_role),
         }
     }
