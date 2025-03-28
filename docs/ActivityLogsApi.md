@@ -1,6 +1,6 @@
 # \ActivityLogsApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -14,7 +14,7 @@ Method | HTTP request | Description
 > models::ActivityLogResponseV2WithTotal get_activity_log_for_groups(authorization, group_ids_list, start_date_unix_ms, end_date_unix_ms, page_number, page_size, coin, activity_type, user_email, sub_account_name, sort, hide_auth_logs)
 Get Activity Logs for a List of Groups
 
-Get activity log for a list of groups. Mining account owner or accountant authentication required to see own groups activity log. Admin authentication with read permission required to see other groups activity log.
+Get activity logs for a list of groups. Mining account owner or accountant authentication required to see own groups activity log. Admin authentication with read permission required to see other groups activity log.
 
 ### Parameters
 

@@ -1,16 +1,48 @@
 # \SubAccountApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
+[**archive_sub_account**](SubAccountApi.md#archive_sub_account) | **PUT** /sub_account/archive/{subAccountName} | Archive Sub-Account
 [**create_sub_account_and_add_withdrawal_address_for_group**](SubAccountApi.md#create_sub_account_and_add_withdrawal_address_for_group) | **POST** /v2/sub_account/{subAccountName}/group/{groupId}/{addressLabel}/{walletAddress} | Create Sub-Account for given Group and Add Withdrawal Address or Create Approval Request for the same.
-[**delete_sub_account**](SubAccountApi.md#delete_sub_account) | **DELETE** /sub_account/{subAccountName} | Delete Sub-Account
 [**get_granted_sub_account_stats**](SubAccountApi.md#get_granted_sub_account_stats) | **GET** /granted_subaccount_stats/{userId} | Granted Sub-Account Stats
 [**get_sub_account_hashrate**](SubAccountApi.md#get_sub_account_hashrate) | **GET** /subaccount_hashrate_hour/{subAccountName} | Hashrate Per Hour
 [**get_sub_account_hashrate1**](SubAccountApi.md#get_sub_account_hashrate1) | **GET** /subaccount_hashrate_day/{subAccountName} | Hashrate Per Day
 [**get_sub_account_stats**](SubAccountApi.md#get_sub_account_stats) | **GET** /subaccount_stats/{subAccountName} | Sub-Account Stats
+[**unarchive_sub_account**](SubAccountApi.md#unarchive_sub_account) | **PUT** /sub_account/unarchive/{subAccountName} | Unarchive Sub-Account
 
+
+
+## archive_sub_account
+
+> archive_sub_account(authorization, sub_account_name)
+Archive Sub-Account
+
+Archive sub-account with no balance and zero hashrate for past 24 hours. Requires sub-account owner permissions
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**authorization** | **String** | OAuth2.0 access token. | [required] |
+**sub_account_name** | **String** | Name of the sub-account to be archived | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
 ## create_sub_account_and_add_withdrawal_address_for_group
@@ -50,40 +82,9 @@ No authorization required
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## delete_sub_account
-
-> delete_sub_account(sub_account_name, authorization)
-Delete Sub-Account
-
-Delete sub-account with no mining history. Requires permission to create sub-account.
-
-### Parameters
-
-
-Name | Type | Description  | Required | Notes
-------------- | ------------- | ------------- | ------------- | -------------
-**sub_account_name** | **String** | Name of the sub-account to be deleted | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. |  |
-
-### Return type
-
- (empty response body)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: Not defined
-
-[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
-
-
 ## get_granted_sub_account_stats
 
-> Vec<models::SubAccountStatsWithRoleResponse> get_granted_sub_account_stats(user_id, authorization, coin, sort, group_ids_list)
+> Vec<models::SubAccountStatsWithRoleResponse> get_granted_sub_account_stats(user_id, authorization, coin, sort, group_ids_list, archived)
 Granted Sub-Account Stats
 
 Get stats for sub-accounts that the user owns or has granted access to. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.
@@ -98,6 +99,7 @@ Name | Type | Description  | Required | Notes
 **coin** | Option<**String**> | Name of requested coin. Default value is BTC. |  |[default to BTC]
 **sort** | Option<**String**> | Valid values are \"highestHashrate\" or \"subAccountName\". |  |[default to subAccountName]
 **group_ids_list** | Option<[**Vec<i32>**](i32.md)> | List of group ids. |  |
+**archived** | Option<**bool**> | Optional boolean which determines if archived sub-accounts should be included. Defaults to false. |  |[default to false]
 
 ### Return type
 
@@ -217,6 +219,37 @@ No authorization required
 
 - **Content-Type**: Not defined
 - **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## unarchive_sub_account
+
+> unarchive_sub_account(authorization, sub_account_name)
+Unarchive Sub-Account
+
+Unarchive inactive sub-account. Requires sub-account owner permissions
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**authorization** | **String** | OAuth2.0 access token. | [required] |
+**sub_account_name** | **String** | Name of the sub-account to be unarchived | [required] |
+
+### Return type
+
+ (empty response body)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: Not defined
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 

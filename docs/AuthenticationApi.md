@@ -1,6 +1,6 @@
 # \AuthenticationApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

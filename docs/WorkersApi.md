@@ -1,6 +1,6 @@
 # \WorkersApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -22,7 +22,7 @@ Method | HTTP request | Description
 
 ## create_tag
 
-> i32 create_tag(coin_string, sub_account_name, tag_name, authorization, x_api_key)
+> i32 create_tag(coin_string, sub_account_name, tag_name, authorization)
 Create Tag
 
 Create a tag. Requires permission to edit workers.
@@ -35,8 +35,7 @@ Name | Type | Description  | Required | Notes
 **coin_string** | **String** | Coin string. valid values are \"BTC\" or \"BCH\" | [required] |
 **sub_account_name** | **String** | Sub-account name | [required] |
 **tag_name** | **String** | Tag name | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. Not required if using API key. |  |
-**x_api_key** | Option<**String**> | API key. Not required if using access token. |  |
+**authorization** | Option<**String**> | OAuth2.0 access token. |  |
 
 ### Return type
 
@@ -56,7 +55,7 @@ No authorization required
 
 ## delete_tag
 
-> delete_tag(coin_string, sub_account_name, tag_name, authorization, x_api_key)
+> delete_tag(coin_string, sub_account_name, tag_name, authorization)
 Delete Tag
 
 Delete a tag. Deleting will untag all the workers under the specified tag. Requires permission to edit workers.
@@ -69,8 +68,7 @@ Name | Type | Description  | Required | Notes
 **coin_string** | **String** | Coin string. valid values are \"BTC\" or \"BCH\" | [required] |
 **sub_account_name** | **String** | Sub-account name associated with the tag | [required] |
 **tag_name** | **String** | Tag name to be deleted | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. Not required if using API key. |  |
-**x_api_key** | Option<**String**> | API key. Not required if using access token. |  |
+**authorization** | Option<**String**> | OAuth2.0 access token. |  |
 
 ### Return type
 
@@ -260,7 +258,7 @@ No authorization required
 > Vec<models::HashrateResponse> get_worker_hashrate(sub_account_name, worker_id, authorization, x_api_key, coin, start, end, start_date_unix_ms, end_date_unix_ms)
 Worker Hashrate Per Hour
 
-Get worker hashrate per hour for a requested date range & coin. Requires permission to view hashrate.
+Get worker hashrate per hour (in GH/s) for a requested date range & coin. Requires permission to view hashrate.
 
 ### Parameters
 
@@ -298,7 +296,7 @@ No authorization required
 > Vec<models::HashrateResponse> get_worker_hashrate1(sub_account_name, worker_id, authorization, x_api_key, coin, start, end)
 Worker Hashrate Per Day
 
-Get worker hashrate per day for a requested date range & coin. Requires permission to view hashrate.
+Get worker hashrate per day (in GH/s) for a requested date range & coin. Requires permission to view hashrate.
 
 ### Parameters
 
@@ -370,7 +368,7 @@ No authorization required
 
 ## tag_workers
 
-> i32 tag_workers(coin_string, sub_account_name, tag_name, request_body, authorization, x_api_key)
+> i32 tag_workers(coin_string, sub_account_name, tag_name, request_body, authorization)
 Tag Workers
 
 Tag a list of workers. Requires permission to edit workers.
@@ -383,9 +381,8 @@ Name | Type | Description  | Required | Notes
 **coin_string** | **String** | Coin string. valid values are \"BTC\" or \"BCH\" | [required] |
 **sub_account_name** | **String** | Sub-account name associated with the tag | [required] |
 **tag_name** | **String** | Tag name | [required] |
-**request_body** | [**Vec<i32>**](i32.md) | List of worker ids to be tagged | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. Not required if using API key. |  |
-**x_api_key** | Option<**String**> | API key. Not required if using access token. |  |
+**request_body** | [**Vec<i64>**](i64.md) | List of worker ids to be tagged | [required] |
+**authorization** | Option<**String**> | OAuth2.0 access token. |  |
 
 ### Return type
 
@@ -405,7 +402,7 @@ No authorization required
 
 ## untag_workers
 
-> untag_workers(coin_string, sub_account_name, request_body, authorization, x_api_key)
+> untag_workers(coin_string, sub_account_name, request_body, authorization)
 Untag Workers
 
 Untag a list of workers. Requires permission to edit workers.
@@ -418,8 +415,7 @@ Name | Type | Description  | Required | Notes
 **coin_string** | **String** | Coin string. valid values are \"BTC\" or \"BCH\" | [required] |
 **sub_account_name** | **String** | Sub-account name associated with the tag | [required] |
 **request_body** | [**Vec<i64>**](i64.md) | List of worker ids to be untagged | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. Not required if using API key. |  |
-**x_api_key** | Option<**String**> | API key. Not required if using access token. |  |
+**authorization** | Option<**String**> | OAuth2.0 access token. |  |
 
 ### Return type
 
@@ -439,10 +435,10 @@ No authorization required
 
 ## update_tag
 
-> i32 update_tag(coin_string, sub_account_name, tag_name, new_tag_name, authorization, x_api_key)
+> i32 update_tag(coin_string, sub_account_name, tag_name, new_tag_name, authorization)
 Update Tag Name
 
-Update a tag name. Requires permission to edit workers.
+Update a tag name. Requires permission to edit workers. Cannot update tag name to 'all' or 'untagged'.
 
 ### Parameters
 
@@ -453,8 +449,7 @@ Name | Type | Description  | Required | Notes
 **sub_account_name** | **String** | Sub-account name associated with the tag | [required] |
 **tag_name** | **String** | Tag name to be updated | [required] |
 **new_tag_name** | **String** | New tag name | [required] |
-**authorization** | Option<**String**> | OAuth2.0 access token. Not required if using API key. |  |
-**x_api_key** | Option<**String**> | API key. Not required if using access token. |  |
+**authorization** | Option<**String**> | OAuth2.0 access token. |  |
 
 ### Return type
 

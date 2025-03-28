@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **approval_threshold** | Option<**i32**> |  | [optional]
 **approval_status** | Option<**String**> |  | [optional]
 **approvers** | Option<**String**> |  | [optional]
+**approval_action_required** | Option<**bool**> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

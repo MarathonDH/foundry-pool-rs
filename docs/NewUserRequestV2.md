@@ -10,6 +10,7 @@ Name | Type | Description | Notes
 **groups** | [**Vec<models::UserGroupRequest>**](UserGroupRequest.md) | List of UserGroupRequest objects | 
 **api_user** | Option<**bool**> | True for API-Only users. | [optional][default to false]
 **ips** | Option<**Vec<String>**> | List of API User's IPs. Only valid if apiUser equals true. | [optional]
+**sub_account_names** | Option<**Vec<String>**> | List of sub-accounts to add the user to. If null, user will be added to all sub-accounts | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

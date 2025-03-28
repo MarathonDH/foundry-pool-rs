@@ -24,6 +24,7 @@ Name | Type | Description | Notes
 **group_id** | **i32** |  | 
 **group_name** | **String** |  | 
 **fcm_opt_in** | **bool** |  | 
+**is_active** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

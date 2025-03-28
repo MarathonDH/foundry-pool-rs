@@ -1,6 +1,6 @@
 # \UserApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
@@ -9,6 +9,7 @@ Method | HTTP request | Description
 [**delete_user_sub_account_role**](UserApi.md#delete_user_sub_account_role) | **DELETE** /users/{userId}/sub-account_role/{subAccountName} | Delete User’s Role for a Sub-Account
 [**get_role_info_by_sub_account_name_and_user_id**](UserApi.md#get_role_info_by_sub_account_name_and_user_id) | **GET** /get_role/{subAccountName}/{userId} | Get a Users Role for a Sub-Account
 [**get_user_by_logged_in_user**](UserApi.md#get_user_by_logged_in_user) | **GET** /users/logged-in-user | Get User Info (Self)
+[**get_users_by_group**](UserApi.md#get_users_by_group) | **GET** /v2/users/users-by-group | Get All Users Associated with a Group
 [**get_users_by_group_list**](UserApi.md#get_users_by_group_list) | **GET** /v2/users/users-by-groups | Get All Users Associated with a List of Groups
 [**register**](UserApi.md#register) | **POST** /v2/users | Create User or Add User to group(s) or Create Approval Request for the same
 [**update_all_user_sub_account_roles**](UserApi.md#update_all_user_sub_account_roles) | **PUT** /v2/users/{userId}/group/{groupId}/role/{newSubAccountRoleName} | Update User’s Role for All Sub-Accounts or Create Approval Request for the same
@@ -28,7 +29,7 @@ Add user to an existing sub-account. Requires admin write or owner permissions f
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 **user_id** | **i32** | User ID to be added to sub-account | [required] |
 **sub_account_name** | **String** | Sub-Account name the user is to be added | [required] |
 **add_user_to_sub_account_request** | Option<[**AddUserToSubAccountRequest**](AddUserToSubAccountRequest.md)> | Sub-Account role to be provided to this user. Valid values are \"owner\", \"technician\", \"accountant\" or \"approver\".  Optional - Will default to user's defaultSubAccountRole if not included. |  |
@@ -93,7 +94,7 @@ Delete user’s role for a sub-account. Requires set role permissions for the su
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 **user_id** | **i32** | User ID associated with the role to be deleted | [required] |
 **sub_account_name** | **String** | Sub-Account name the user's role is to be deleted from | [required] |
 
@@ -157,11 +158,46 @@ Get info for user associated with the provided authentication token.
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 
 ### Return type
 
 [**models::User**](User.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## get_users_by_group
+
+> Vec<models::GroupWithUsersResponseV2> get_users_by_group(authorization, group_id, page_number, page_size, sort, user_full_name)
+Get All Users Associated with a Group
+
+Get all users associated with a group. Requires logged-in user to have access to and view permissions for group.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**authorization** | **String** | OAuth2.0 access token. | [required] |
+**group_id** | **i32** | Group ID. | [required] |
+**page_number** | Option<**i32**> | Optional page number.  Defaults to 0. |  |[default to 0]
+**page_size** | Option<**i32**> | Optional page size.  If empty, returns all results. |  |[default to -1]
+**sort** | Option<**String**> | Optional sort value.  Options are 'fullNameAsc', 'fullNameDesc', 'emailAddressAsc', 'emailAddressDesc', 'defaultRoleAsc', or 'defaultRoleDesc'.  If empty, defaults to fullNameAsc. |  |[default to fullNameAsc]
+**user_full_name** | Option<**String**> | Optional user name filter value.  If empty, returns all results. |  |[default to ]
+
+### Return type
+
+[**Vec<models::GroupWithUsersResponseV2>**](GroupWithUsersResponseV2.md)
 
 ### Authorization
 
@@ -187,7 +223,7 @@ Get all users associated with a list of groups. Requires logged-in user to have 
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 **group_ids_list** | Option<[**Vec<i32>**](i32.md)> | Optional List of Group IDs.  If empty, returns all users in all groups the logged-in user has view permissions for. |  |
 
 ### Return type
@@ -249,10 +285,10 @@ Update user’s role for all sub-accounts, if your group doesn't satisfy the app
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 **user_id** | **i32** | The ID of the user | [required] |
 **group_id** | **i32** | The ID of the group | [required] |
-**new_sub_account_role_name** | [**String**](.md) | Sub-Account Role Name, valid values are \"owner\", \"technician\", \"accountant\" or \"approver\". | [required] |
+**new_sub_account_role_name** | **String** | Sub-Account Role Name, valid values are \"owner\", \"technician\", \"accountant\" or \"approver\". | [required] |
 
 ### Return type
 
@@ -282,7 +318,7 @@ Update user’s role for a sub-account. Requires set role permissions for the su
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**authorization** | [**String**](.md) | OAuth2.0 access token. | [required] |
+**authorization** | **String** | OAuth2.0 access token. | [required] |
 **user_id** | **i32** | The ID of the user | [required] |
 **sub_account_name** | **String** | The name of the sub-account | [required] |
 **sub_account_role_name** | **String** | Sub-Account Role Name, valid values are \"owner\", \"technician\", \"accountant\" or \"approver\". | [required] |

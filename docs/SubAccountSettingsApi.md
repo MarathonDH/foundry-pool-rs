@@ -1,21 +1,21 @@
 # \SubAccountSettingsApi
 
-All URIs are relative to *http://api.foundryusapool.com*
+All URIs are relative to *https://api.foundryusapool.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------
-[**create_api_key**](SubAccountSettingsApi.md#create_api_key) | **PUT** /api_keys/{subAccountName} | Create API key
-[**delete_api_key**](SubAccountSettingsApi.md#delete_api_key) | **DELETE** /api_keys/{subAccountName}/{apiKey} | Delete API key
-[**get_api_key**](SubAccountSettingsApi.md#get_api_key) | **GET** /api_keys/{subAccountName} | Get API keys
+[**create_api_key**](SubAccountSettingsApi.md#create_api_key) | **PUT** /api_keys/{subAccountName} | Create API Key
+[**delete_api_key**](SubAccountSettingsApi.md#delete_api_key) | **DELETE** /api_keys/{subAccountName}/{apiKey} | Delete API Key
+[**get_api_key**](SubAccountSettingsApi.md#get_api_key) | **GET** /api_keys/{subAccountName} | Get API Keys
 
 
 
 ## create_api_key
 
 > create_api_key(sub_account_name, authorization, key_name, role)
-Create API key
+Create API Key
 
-Create API key for a given sub-account. Requires sub-account owner authentication.
+Create API key for a given sub-account with given role. Requires sub-account owner authentication.
 
 ### Parameters
 
@@ -46,9 +46,9 @@ No authorization required
 ## delete_api_key
 
 > delete_api_key(sub_account_name, api_key, authorization)
-Delete API key
+Delete API Key
 
-Delete API key for a given sub-account. Requires permission to view hashrate.
+Delete an API key for a given sub-account. Requires permission to view hashrate.
 
 ### Parameters
 
@@ -78,9 +78,9 @@ No authorization required
 ## get_api_key
 
 > get_api_key(sub_account_name, authorization, role)
-Get API keys
+Get API Keys
 
-Get list of API keys for a given sub-account. Requires sub-account owner authentication.
+Get list of API keys for a given sub-account and role. If role is \"technician\", requires permission to view hashrate. If role is \"accountant\", requires permission to view payments.
 
 ### Parameters
 

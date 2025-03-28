@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **last_share_time** | **String** |  | 
 **updated_at** | **String** |  | 
 **fcm_opt_in** | **bool** |  | 
+**is_active** | **bool** |  | 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

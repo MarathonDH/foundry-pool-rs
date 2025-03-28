@@ -1,0 +1,4957 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Foundry USA Pool API",
+    "description": "The Foundry USA Pool API allows users to view data and perform actions using custom written software. To get started, please follow the instructions in the Authentication Test endpoint.",
+    "version": "6.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.foundryusapool.com",
+      "description": "Generated server url"
+    }
+  ],
+  "tags": [
+    { "name": "Authentication" },
+    { "name": "Access Token" },
+    { "name": "Activity Logs" },
+    { "name": "Alerts" },
+    { "name": "Approvals" },
+    { "name": "Coins" },
+    { "name": "Financial" },
+    { "name": "Pool" },
+    { "name": "Sub-Account" },
+    { "name": "Sub-Account Settings" },
+    { "name": "Sub-Accounts" },
+    { "name": "User" },
+    { "name": "Wallets" },
+    { "name": "Workers" }
+  ],
+  "paths": {
+    "/wallets/deactivateAutoWithdrawal/{subAccountName}": {
+      "put": {
+        "tags": ["Wallets"],
+        "summary": "Deactivate Auto-Withdrawal",
+        "description": "Turn auto-withdrawal off for a sub-account. Requires withdraw permissions for the sub-account.",
+        "operationId": "setAutoWithdrawalOff",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the sub-account you want to deactivate auto-withdrawal for",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The number of addresses turned off is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User does not have withdraw permissions for the sub-account"
+          }
+        }
+      }
+    },
+    "/wallets/addresses/{subAccountName}/{addressLabel}/{walletAddress}": {
+      "put": {
+        "tags": ["Wallets"],
+        "summary": "Add a New Withdrawal Address or Create Approval Request for the same",
+        "description": "Add a new withdrawal address for a sub-account, if your group doesn't satisfy the approval request creation threshold. Else, create an approval request to do the same. If there is an existing address where autowithdraw is ON, the new wallets allocationPercent is set to 0 and autoWithdraw is turned off. Else the new wallets allocationPercent is set to 100 and autoWithdraw is turned on. Requires authorized user.",
+        "operationId": "addWithdrawalAddress",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of sub-account to which the new address is being added",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "addressLabel",
+            "in": "path",
+            "description": "Label for the address to be added",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "address1"
+          },
+          {
+            "name": "walletAddress",
+            "in": "path",
+            "description": "Address to be added",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Address added successfully and wallet info is returned",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WalletResponse" },
+                "examples": {
+                  "First Autowithdrawal Wallet Response": {
+                    "description": "First Autowithdrawal Wallet Response",
+                    "externalValue": "/assets/responseExamples/Wallets/addWithdrawalAddress.json"
+                  },
+                  "Additional Autowithdrawal Wallet Response": {
+                    "description": "Additional Autowithdrawal Wallet Response",
+                    "externalValue": "/assets/responseExamples/Wallets/addAdditionalWithdrawalAddress.json"
+                  },
+                  "Approval Request Wallet Response": {
+                    "description": "Approval Request Wallet Response",
+                    "externalValue": "/assets/responseExamples/Wallets/addWithdrawalAddressApprovalRequest.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad Request: Invalid address format." },
+          "403": {
+            "description": "Forbidden: Coin address Address is restricted."
+          },
+          "409": {
+            "description": "Conflict: Specified address already exists, An address with specified name already exists."
+          }
+        }
+      }
+    },
+    "/v2/users/{userId}/group/{groupId}/role/{newSubAccountRoleName}": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Update User’s Role for All Sub-Accounts or Create Approval Request for the same",
+        "description": "Update user’s role for all sub-accounts, if your group doesn't satisfy the approval request creation threshold. Else, create an approval request to do the same. Requires mining account owner authentication.",
+        "operationId": "updateAllUserSubAccountRoles",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The ID of the user",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "The ID of the group",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 2
+          },
+          {
+            "name": "newSubAccountRoleName",
+            "in": "path",
+            "description": "Sub-Account Role Name, valid values are \"owner\", \"technician\", \"accountant\" or \"approver\".",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "technician"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's role for all sub-accounts updated successfully and the UserResponse of the updated user is returned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseV2" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/User/updateAllUserSubAccountRoles.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Admin's access cannot be updated or deactivated. | User Sub Account Role with specified name does not exist"
+          },
+          "403": {
+            "description": "Forbidden: Requires mining account owner or higher. | User with group owner role can only be added to sub-account as owner | User cannot be modified because the group <group_name>'s approval threshold is equal to the number of approvers in group."
+          },
+          "404": {
+            "description": "Not Found: User or Group not found | User not found in group"
+          }
+        }
+      }
+    },
+    "/users/{userId}/sub-account_role/{subAccountName}": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Add User to an Existing Sub-Account",
+        "description": "Add user to an existing sub-account. Requires admin write or owner permissions for the sub-account.",
+        "operationId": "addSubAccountUser",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID to be added to sub-account",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account name the user is to be added",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "requestBody": {
+          "description": "Sub-Account role to be provided to this user. Valid values are \"owner\", \"technician\", \"accountant\" or \"approver\".  Optional - Will default to user's defaultSubAccountRole if not included.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddUserToSubAccountRequest"
+              },
+              "examples": {
+                "Add User To Sub-Account Request Body": {
+                  "description": "Add User To Sub-Account Request Body",
+                  "externalValue": "/assets/requestBodyExamples/User/addSubAccountUser.json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "No Content: User added to sub-account" },
+          "403": {
+            "description": "Forbidden: User is inactive. or already exists in the subaccount provided; User with group owner role can only be added to sub-account as owner"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["User"],
+        "summary": "Delete User’s Role for a Sub-Account",
+        "description": "Delete user’s role for a sub-account. Requires set role permissions for the sub-account.",
+        "operationId": "deleteUserSubAccountRole",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID associated with the role to be deleted",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account name the user's role is to be deleted from",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "User's role for a sub-account deleted successfully."
+          },
+          "400": {
+            "description": "Bad Request: Group owner's access can not be modified or deleted OR Deactivated user's access can not be modified or deleted."
+          }
+        }
+      }
+    },
+    "/users/{userId}/sub-account_role/{subAccountName}/{subAccountRoleName}": {
+      "put": {
+        "tags": ["User"],
+        "summary": "Update User’s Role for a Sub-Account",
+        "description": "Update user’s role for a sub-account. Requires set role permissions for the sub-account.",
+        "operationId": "updateUserSubAccountRole",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The ID of the user",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "The name of the sub-account",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "subAccountRoleName",
+            "in": "path",
+            "description": "Sub-Account Role Name, valid values are \"owner\", \"technician\", \"accountant\" or \"approver\".",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "technician"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User's role for a sub-account updated successfully and the ID of the updated user is returned.",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Group owner's access can not be modified or deleted OR Deactivated user's access can not be modified or deleted."
+          }
+        }
+      }
+    },
+    "/tags/{coinString}/{subAccountName}/{tagName}": {
+      "put": {
+        "tags": ["Workers"],
+        "summary": "Create Tag",
+        "description": "Create a tag. Requires permission to edit workers.",
+        "operationId": "createTag",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "tagName",
+            "in": "path",
+            "description": "Tag name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "datacenter1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ID of created tag is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "409": { "description": "Tag with specified name already exists" },
+          "400": {
+            "description": "Specify a name other than 'all' and 'untagged'"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["Workers"],
+        "summary": "Delete Tag",
+        "description": "Delete a tag. Deleting will untag all the workers under the specified tag. Requires permission to edit workers.",
+        "operationId": "deleteTag",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name associated with the tag",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "tagName",
+            "in": "path",
+            "description": "Tag name to be deleted",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "datacenter1"
+          }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    },
+    "/tags/update/{coinString}/{subAccountName}/{tagName}/{newTagName}": {
+      "put": {
+        "tags": ["Workers"],
+        "summary": "Update Tag Name",
+        "description": "Update a tag name. Requires permission to edit workers. Cannot update tag name to 'all' or 'untagged'.",
+        "operationId": "updateTag",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name associated with the tag",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "tagName",
+            "in": "path",
+            "description": "Tag name to be updated",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "datacenter1"
+          },
+          {
+            "name": "newTagName",
+            "in": "path",
+            "description": "New tag name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "datacenter2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ID of updated tag is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Tag with specified name does not exist. "
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have Worker Edit permission for sub-account"
+          },
+          "404": {
+            "description": "Not Found: Cannot find sub-account",
+            "content": {
+              "*/*": { "schema": { "type": "integer", "format": "int32" } }
+            }
+          },
+          "409": {
+            "description": "Conflict: Tag with new name already exists."
+          }
+        }
+      }
+    },
+    "/tags/tag/{coinString}/{subAccountName}/{tagName}": {
+      "put": {
+        "tags": ["Workers"],
+        "summary": "Tag Workers",
+        "description": "Tag a list of workers. Requires permission to edit workers.",
+        "operationId": "tagWorkers",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name associated with the tag",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "tagName",
+            "in": "path",
+            "description": "Tag name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "datacenter1"
+          }
+        ],
+        "requestBody": {
+          "description": "List of worker ids to be tagged",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "type": "integer", "format": "int64" }
+              },
+              "examples": {
+                "Request Body Example": {
+                  "description": "Request Body Example",
+                  "externalValue": "/assets/requestBodyExamples/Workers/workerIdList.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Returns Number of successful tagged",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 3
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Tag with specified name does not exist"
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have Worker Edit permission."
+          },
+          "404": { "description": "Not Found: Cannot find sub-account" }
+        }
+      }
+    },
+    "/sub_account/unarchive/{subAccountName}": {
+      "put": {
+        "tags": ["Sub-Account"],
+        "summary": "Unarchive Sub-Account",
+        "description": "Unarchive inactive sub-account. Requires sub-account owner permissions",
+        "operationId": "unarchiveSubAccount",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the sub-account to be unarchived",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "responses": {
+          "200": { "description": "No content" },
+          "409": {
+            "description": "Sub-account with the name SubAccount Name is already unarchived."
+          },
+          "403": {
+            "description": "Insufficient privileges. Requires sub-account owner permissions"
+          },
+          "404": {
+            "description": "Sub-account with name SubAccount Name not found."
+          }
+        }
+      }
+    },
+    "/sub_account/archive/{subAccountName}": {
+      "put": {
+        "tags": ["Sub-Account"],
+        "summary": "Archive Sub-Account",
+        "description": "Archive sub-account with no balance and zero hashrate for past 24 hours. Requires sub-account owner permissions",
+        "operationId": "archiveSubAccount",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the sub-account to be archived",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "responses": {
+          "200": { "description": "No content" },
+          "409": {
+            "description": "Sub-accounts with a balance or hashrate greater than zero cannot be archived. | Sub-account with the name SubAccount Name is already archived."
+          },
+          "403": {
+            "description": "Insufficient privileges. Requires sub-account owner permissions"
+          },
+          "404": {
+            "description": "Sub-account with name SubAccount Name not found."
+          }
+        }
+      }
+    },
+    "/group/{groupId}/update_approval_threshold/{newApprovalThreshold}": {
+      "put": {
+        "tags": ["Approvals"],
+        "summary": "Update Group Approval Threshold",
+        "description": "Update a Group's Approval Threshold, or Create Approval Request for the same.  Requires group or sub-account owner/approver permission",
+        "operationId": "updateGroupApprovalThreshold",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "Id of the Group to update",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 123
+          },
+          {
+            "name": "newApprovalThreshold",
+            "in": "path",
+            "description": "New Approval Threshold for Group",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 2
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupThresholdUpdateResponse"
+                },
+                "examples": {
+                  "Approval Request Created to Update Group Approval Threshold": {
+                    "description": "Approval Request Created to Update Group Approval Threshold",
+                    "externalValue": "/assets/responseExamples/Approvals/updateApprovalThresholdRequestCreated.json"
+                  },
+                  "Group Approval Threshold Updated": {
+                    "description": "Group Approval Threshold Updated",
+                    "externalValue": "/assets/responseExamples/Approvals/updateApprovalThresholdSuccess.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Approval threshold must be at least 1 | New approval threshold cannot exceed the number of owners in group | Group groupName approval threshold is already newApprovalThreshold | New approval threshold newApprovalThreshold cannot exceed the number of approvers in group approversInGroup"
+          },
+          "404": { "description": "Group with id <groupId> does not exist." }
+        }
+      }
+    },
+    "/api_keys/{subAccountName}": {
+      "get": {
+        "tags": ["Sub-Account Settings"],
+        "summary": "Get API Keys",
+        "description": "Get list of API keys for a given sub-account and role. If role is \"technician\", requires permission to view hashrate. If role is \"accountant\", requires permission to view payments.",
+        "operationId": "getApiKey",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subAccount1"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "Valid values are \"technician\" (permission to view hashrate and workers) and \"accountant\" (permission to view hashrate, workers, and financial data). Default value is \"technician\".",
+            "required": false,
+            "schema": { "type": "string", "default": "technician" },
+            "example": "technician"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccountSettings/getApiKey.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Forbidden. User does not have permission" },
+          "404": { "description": "Not Found. Sub-account does not exist." }
+        }
+      },
+      "put": {
+        "tags": ["Sub-Account Settings"],
+        "summary": "Create API Key",
+        "description": "Create API key for a given sub-account with given role. Requires sub-account owner authentication.",
+        "operationId": "createApiKey",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subAccount1"
+          },
+          {
+            "name": "keyName",
+            "in": "query",
+            "description": "This can be any text you want under 100 characters. It's intended for describing who you'll be sharing the key with. Default value is \"default\".",
+            "required": false,
+            "schema": { "type": "string", "default": "default" },
+            "example": "default"
+          },
+          {
+            "name": "role",
+            "in": "query",
+            "description": "Valid values are \"technician\" (permission to view hashrate and workers) and \"accountant\" (permission to view hashrate, workers, and financial data). Default value is \"technician\".",
+            "required": false,
+            "schema": { "type": "string", "default": "technician" },
+            "example": "technician"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccountSettings/createApiKey.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. User does not have permission to manage API keys for this subaccount."
+          },
+          "404": { "description": "Not Found. Sub-account does not exist." }
+        }
+      }
+    },
+    "/alerts/updateSubAccountAlert/{coinString}/{subAccountName}/{alertId}": {
+      "put": {
+        "tags": ["Alerts"],
+        "summary": "Updating Existing Sub-Account Alert",
+        "description": "Updates an existing sub-account alert. Requires permission to view hashrate.",
+        "operationId": "updateSubAccountAlert",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub Account Name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "alertId",
+            "in": "path",
+            "description": "Alert ID",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "hashrateThreshold",
+            "in": "query",
+            "description": "Hashrate threshold for the alert in GH/s.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 100
+          },
+          {
+            "name": "activeWorkersThreshold",
+            "in": "query",
+            "description": "Active Workers threshold for the alert.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 10
+          }
+        ],
+        "requestBody": {
+          "description": "List of email addresses to be notified when the alert is triggered.",
+          "content": {
+            "application/json": {
+              "schema": { "type": "array", "items": { "type": "string" } },
+              "examples": {
+                "Update Alert": {
+                  "description": "Update Alert",
+                  "externalValue": "/assets/requestBodyExamples/Alerts/updateSubAccountAlert.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Updated, ID of Alert is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Alert does not exist, Email address is invalid, This email is already configured to receive this alert."
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires view hashrate permissions for this sub account."
+          },
+          "404": {
+            "description": "Not Found: Alert ID or Sub-Account not found."
+          }
+        }
+      }
+    },
+    "/wallets/saveAutoWithdrawalDetails/{subAccountName}/{coinString}": {
+      "post": {
+        "tags": ["Wallets"],
+        "summary": "Save Auto-Withdrawal Details or Create Approval Request for the same",
+        "description": "Save auto-withdrawal details for a sub-account or create approval request to do the same. Requires authorized user. Addresses in the request should already be added.",
+        "operationId": "saveAutoWithdrawalDetails",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of subAccount.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Name of requested coin.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          }
+        ],
+        "requestBody": {
+          "description": "A list of wallet allocation requests. Each allocation request must contain following fields",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/WalletAllocationRequest"
+                }
+              },
+              "examples": {
+                "Example Request": {
+                  "description": "Example Request",
+                  "externalValue": "/assets/requestBodyExamples/saveAutoWithdrawalDetails.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The number of addresses updated is returned, 0 if approval request was created",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 2
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Total Allocation must be 100 percent, At least one of the wallet addresses is not already added"
+          },
+          "409": {
+            "description": "Conflict: This sub-account already has a pending payout update request"
+          },
+          "403": {
+            "description": "Forbidden: User does not have withdraw permissions for the sub-account"
+          }
+        }
+      }
+    },
+    "/v2/users": {
+      "post": {
+        "tags": ["User"],
+        "summary": "Create User or Add User to group(s) or Create Approval Request for the same",
+        "description": "Creates a user and adds it to the groups that don't satisfy the approval request creation threshold to it. Else, create an approval request to do the same. Requires mining account owner or admin write authentication.",
+        "operationId": "register",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          }
+        ],
+        "requestBody": {
+          "description": "User info that needs to be added to the group",
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/NewUserRequestV2" },
+              "examples": {
+                "Create or Add User Request": {
+                  "description": "Create or Add User Request",
+                  "externalValue": "/assets/requestBodyExamples/User/createOrAddUser.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "UserResponse of the registered user",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseV2" },
+                "examples": {
+                  "Created or Added User Response": {
+                    "description": "Created or Added User Response",
+                    "externalValue": "/assets/responseExamples/User/createdOrAddedUser.json"
+                  },
+                  "Create or Add User Approval Request Response": {
+                    "description": "Create or Add User Approval Request Response",
+                    "externalValue": "/assets/responseExamples/User/createOrAddApprovalRequest.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Specified email is invalid; API User with owner Role does not provide a list of IPs; IP format is invalid; User Sub Account Role with specified name does not exist;"
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires mining account owner or higher; User fullName is inactive; Access to the multi-group per user feature is not enabled."
+          },
+          "409": { "description": "Conflict: User with email already exists." },
+          "404": {
+            "description": "Sub-account(s) inactive or not found in group(s)."
+          }
+        }
+      }
+    },
+    "/v2/sub_account/{subAccountName}/group/{groupId}/{addressLabel}/{walletAddress}": {
+      "post": {
+        "tags": ["Sub-Account"],
+        "summary": "Create Sub-Account for given Group and Add Withdrawal Address or Create Approval Request for the same.",
+        "description": "Create a new sub-account for given group and add an initial withdrawal address to it, if your group doesn't satisfy the approval request creation threshold. Else, create an approval request to do the same. Requires sub-account owner authentication.",
+        "operationId": "createSubAccountAndAddWithdrawalAddressForGroup",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the new sub-account",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "groupId",
+            "in": "path",
+            "description": "Group ID for the group to which the sub-account belongs",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "addressLabel",
+            "in": "path",
+            "description": "Label for the new withdrawal address",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "wallet1"
+          },
+          {
+            "name": "walletAddress",
+            "in": "path",
+            "description": "Withdrawal address",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "1A1zP1eP5QGefi2DMPTfTL5SLmv7DivfNa"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "user_id",
+            "in": "query",
+            "description": "User ID for the owner of the new-subaccount. Default value is the user ID associated with your access token. Do not include this param if you're not an admin. Only admins with write permission can create sub-accounts on behalf of other users.",
+            "required": false,
+            "schema": { "type": "string", "default": "-1" },
+            "example": 1
+          }
+        ],
+        "requestBody": {
+          "description": "An optional array specifying users and their sub-account role. All group owners must be present in the array. Each array entry must contain the following fields. userId: an Integer that corresponds to a User ID. subAccountRole: a String that represents the subAccountRole you want to be given to the User ID, Allowed values for subAccountRole are \"owner\", \"technician\" or \"accountant\"",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SubAccountAccessRequest"
+                }
+              },
+              "examples": {
+                "Create SubAccount Request Body": {
+                  "description": "Create SubAccount Request Body",
+                  "externalValue": "/assets/requestBodyExamples/SubAccount/createSubAccount.json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WalletResponse" },
+                "examples": {
+                  "Approved SubAccount Creation Response": {
+                    "description": "Approved SubAccount Creation Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/createSubAccountApproved.json"
+                  },
+                  "Pending SubAccount Creation Response": {
+                    "description": "Pending SubAccount Creation Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/createSubAccountPending.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid Address format for coin BTC/BCH | No user access specified in the request body | Please ensure that all the Group owners are specified in the accessRequest attribute of request body | Group owners cannot be granted any role other than owner | Request body incorrectly formatted. userId or/and subAccountRole is missing for a user access | Sub-account name must only contain lower-case alphanumeric characters"
+          },
+          "403": {
+            "description": "Insufficient privileges. You do not have access to group Group Name | Insufficient privileges. Requires sub-account owner or higher. | Coin address is restricted. | The access to the multi-group per user feature is not enabled."
+          },
+          "404": {
+            "description": "User with userId 'User ID' not found in a group with groupId Group ID | Incorrect role specified for userId User ID"
+          },
+          "409": {
+            "description": "Sub-account with name SubAccount Name already exists."
+          }
+        }
+      }
+    },
+    "/approvals/{approvalRequestId}": {
+      "post": {
+        "tags": ["Approvals"],
+        "summary": "Approve Or Reject An Approval Request",
+        "description": "Approve or reject an approval request. Requires approver permissions.",
+        "operationId": "approvalAction",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "approvalRequestId",
+            "in": "path",
+            "description": "Approval request ID",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 123
+          }
+        ],
+        "requestBody": {
+          "description": "Accepted values are \"approve\" or \"reject\"",
+          "content": {
+            "application/json": {
+              "schema": { "type": "object" },
+              "examples": {
+                "Approve Request": {
+                  "description": "Approve Request",
+                  "externalValue": "/assets/requestBodyExamples/Approvals/approvalAction.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK: Response varies based on type of approval request. See Response samples for examples.",
+            "content": {
+              "*/*": {
+                "schema": { "type": "string" },
+                "examples": {
+                  "Approved Add Address Response": {
+                    "description": "Approved Add Address Response",
+                    "externalValue": "/assets/responseExamples/Approvals/approvedAddAddress.json"
+                  },
+                  "Approved Add User Response": {
+                    "description": "Approved Add User Response",
+                    "externalValue": "/assets/responseExamples/Approvals/approvedAddUser.json"
+                  },
+                  "Approved Update User Response that hasn't met approval threshold": {
+                    "description": "Approved Update User Response that hasn't met approval threshold",
+                    "externalValue": "/assets/responseExamples/Approvals/approvedUpdateUser.json"
+                  },
+                  "Approved Deactivate User Response": {
+                    "description": "Approved Deactivate User Response",
+                    "externalValue": "/assets/responseExamples/Approvals/approvedDeactivateUser.json"
+                  },
+                  "Rejected Response": {
+                    "description": "Rejected Response",
+                    "value": {}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Invalid approvalRequestId, invalid request body, invalid approval action, Approval request has expired, Approval request was already approved or rejected."
+          }
+        }
+      }
+    },
+    "/alerts/addSubAccount/{coinString}/{subAccountName}": {
+      "post": {
+        "tags": ["Alerts"],
+        "summary": "Create Alert For A Sub-Account",
+        "description": "Creates an alert for a specified sub-account. ID of created alert is returned. Requires permission to view hashrate.",
+        "operationId": "createNewSubAccountAlert",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub Account Name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "hashrateThreshold",
+            "in": "query",
+            "description": "Hashrate threshold for the alert in GH/s.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 100
+          },
+          {
+            "name": "activeWorkersThreshold",
+            "in": "query",
+            "description": "Active Workers threshold for the alert.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 10
+          }
+        ],
+        "requestBody": {
+          "description": "List of email addresses to be notified when the alert is triggered.",
+          "content": {
+            "application/json": {
+              "schema": { "type": "array", "items": { "type": "string" } },
+              "examples": {
+                "Create Alert": {
+                  "description": "Create Alert",
+                  "externalValue": "/assets/requestBodyExamples/Alerts/createSubAccountAlert.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created, ID of alert is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 1
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Specify either hashrate threshold or active workers threshold or both, Specify at least one email recipient for the alert, At least one of the emails is invalid."
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires view hashrate permissions for this sub account."
+          },
+          "404": { "description": "Not Found: Sub-account not found." }
+        }
+      }
+    },
+    "/workers/{subAccountName}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "All Worker Stats",
+        "description": "Get all worker stats for a sub-account. Requires permission to view hashrate.",
+        "operationId": "getWorkersBySubAccount",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Valid values are \"highestHashrate\", \"lowestHashrate\", \"highestReject\", \"lowestReject\", \"newestShareTime\", \"oldestShareTime\", \"workerName\", \"reverseWorkerName\", \"tagName\", \"reverseTagName\". Default value is highestHashrate.",
+            "required": false,
+            "schema": { "type": "string", "default": "highestHashrate" },
+            "example": "newestShareTime"
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "Valid values are \"all\", \"online<15min\", \"offline<24hr\", or \"offline>24hr\". Default value is all.",
+            "required": false,
+            "schema": { "type": "string", "default": "all" },
+            "example": "offline>24hr"
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "description": "Valid values are \"all\", \"untagged\" or user created tag name. Default value is all.",
+            "required": false,
+            "schema": { "type": "string", "default": "all" },
+            "example": "untagged"
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "Valid values are 0 and positive integers. Default value is 0.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Valid values are -1 (representing max size) and positive integers. Default value is -1.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": -1 },
+            "example": 100
+          },
+          {
+            "name": "workerNameSearchStr",
+            "in": "query",
+            "description": "Default value is \"\" and includes all worker names",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "worker1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Worker stats are returned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkersResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getWorkersBySubAccount.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have view hashrate permission."
+          },
+          "404": { "description": "Not Found: sub-account not found" }
+        }
+      }
+    },
+    "/workers/{subAccountName}/{workerName}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Worker Stats",
+        "description": "Get worker stats. Requires permission to view hashrate.",
+        "operationId": "getWorkerBySubAccountAndWorkerName",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "workerName",
+            "in": "path",
+            "description": "Name of requested worker.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "worker1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkerResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getWorkerBySubAccountAndWorkerName.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have view hashrate permission."
+          },
+          "404": { "description": "Not Found: sub-account or Worker not found" }
+        }
+      }
+    },
+    "/workers/workerCounts/{subAccountName}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Worker Counts by Tag Name",
+        "description": "Get worker counts by tag name. Requires permission to view hashrate.",
+        "operationId": "getWorkerCounts",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "tagName",
+            "in": "query",
+            "description": "Name of requested tag. Default value is \"all\".",
+            "required": false,
+            "schema": { "type": "string", "default": "all" },
+            "example": "datacenter1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success, Worker counts are returned.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WorkerCounts" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getWorkerCounts.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have view hashrate permission for sub-account."
+          },
+          "404": { "description": "Not Found: sub-account not found" }
+        }
+      }
+    },
+    "/worker_hashrate_hour/{subAccountName}/{workerId}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Worker Hashrate Per Hour",
+        "description": "Get worker hashrate per hour (in GH/s) for a requested date range & coin. Requires permission to view hashrate.",
+        "operationId": "getWorkerHashrate",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-29"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current time.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-30"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1716940800000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1717027200000
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "workerId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getWorkerHashratePerHour.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/worker_hashrate_day/{subAccountName}/{workerId}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Worker Hashrate Per Day",
+        "description": "Get worker hashrate per day (in GH/s) for a requested date range & coin. Requires permission to view hashrate.",
+        "operationId": "getWorkerHashrate_1",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "workerId",
+            "in": "path",
+            "description": "ID of requested worker.",
+            "required": true,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is 30 days ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-29"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current day.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-30"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getWorkerHashratePerDay.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requires viewPayments permissions for this sub account."
+          },
+          "404": {
+            "description": "Not Found: sub-account or worker id not found."
+          }
+        }
+      }
+    },
+    "/wallets/autoWithdrawalAddress/{subAccountName}": {
+      "get": {
+        "tags": ["Wallets"],
+        "summary": "Get Enabled Auto-Withdrawal Addresses",
+        "description": "Get addresses for a sub-account where auto-withdraw is enabled. Requires viewPayments permissions for this sub account.",
+        "operationId": "getAutoWithdrawalAddress",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the sub-account you want to get auto-withdrawal address for",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of all auto-withdrawal addresses for the specified sub-account are returned",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WalletsResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Wallets/getAutoWithdrawalAddress.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User does not have view payment permissions for the sub-account"
+          },
+          "404": { "description": "Not Found: Sub-account not found" }
+        }
+      }
+    },
+    "/wallets/addresses/{subAccountName}": {
+      "get": {
+        "tags": ["Wallets"],
+        "summary": "Get Withdrawal Addresses",
+        "description": "Get addresses for a sub-account. This includes addresses where auto-withdraw is either enabled or disabled. Requires viewPayments permissions for this sub account.",
+        "operationId": "getWithdrawalAddresses",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of the sub-account you want to get withdrawal addresses for",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of all withdrawal addresses for the specified sub-account are returned",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/WalletsResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Wallets/getWithdrawalAddresses.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/users/users-by-groups": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get All Users Associated with a List of Groups",
+        "description": "Get all users associated with a list of groups. Requires logged-in user to have access to, and view permissions for, all groups in list.",
+        "operationId": "getUsersByGroupList",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "Optional List of Group IDs.  If empty, returns all users in all groups the logged-in user has view permissions for.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users associated with the provided list of groups is returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupWithUsersResponseV2"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/User/getUsersByGroupList.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Null values present in a List; Duplicated group entry - {id};"
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires group-level approver or higher; access to the multi-group per user feature is not enabled."
+          }
+        }
+      }
+    },
+    "/v2/users/users-by-group": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get All Users Associated with a Group",
+        "description": "Get all users associated with a group. Requires logged-in user to have access to and view permissions for group.",
+        "operationId": "getUsersByGroup",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "groupId",
+            "in": "query",
+            "description": "Group ID.",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "Optional page number.  Defaults to 0.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 1
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Optional page size.  If empty, returns all results.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": -1 },
+            "example": 10
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Optional sort value.  Options are 'fullNameAsc', 'fullNameDesc', 'emailAddressAsc', 'emailAddressDesc', 'defaultRoleAsc', or 'defaultRoleDesc'.  If empty, defaults to fullNameAsc.",
+            "required": false,
+            "schema": { "type": "string", "default": "fullNameAsc" },
+            "example": "fullNameAsc"
+          },
+          {
+            "name": "userFullName",
+            "in": "query",
+            "description": "Optional user name filter value.  If empty, returns all results.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "John Doe"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of users associated with the provided group is returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GroupWithUsersResponseV2"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/User/getUsersByGroup.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires group-level approver or higher."
+          }
+        }
+      }
+    },
+    "/v2/activity_log": {
+      "get": {
+        "tags": ["Activity Logs"],
+        "summary": "Get Activity Logs for a List of Groups",
+        "description": "Get activity logs for a list of groups. Mining account owner or accountant authentication required to see own groups activity log. Admin authentication with read permission required to see other groups activity log.",
+        "operationId": "getActivityLogForGroups",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "List of Group IDs is optional. If no list is passed, all groups the logged-in user has view permissions for is returned.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2]
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is 30 days ago.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": -1 },
+            "example": 1638585600000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": -1 },
+            "example": 1638585600000
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "Valid values are 0 and positive integers.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 3
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Valid values are -1 (representing max size) and positive integers.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 100 },
+            "example": 100
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Filter logs by coin.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "activityType",
+            "in": "query",
+            "description": "Filter logs by activity type. List of available activity types can be GET from /activity_log/activity_types endpoint",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "DELETE_USER"
+          },
+          {
+            "name": "userEmail",
+            "in": "query",
+            "description": "Filter logs by a user's email address",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "satoshinakamoto@foundry.com"
+          },
+          {
+            "name": "subAccountName",
+            "in": "query",
+            "description": "Filter logs by a subAccountName for a Group in which that SubAccount exists",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Sort the logs by \"newest\" or \"oldest\" case-sensitive.",
+            "required": false,
+            "schema": { "type": "string", "default": "newest" },
+            "example": "newest"
+          },
+          {
+            "name": "hideAuthLogs",
+            "in": "query",
+            "description": "Filter logs by hiding all auth0 activity types.",
+            "required": false,
+            "schema": { "type": "boolean" },
+            "example": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ActivityLogResponseV2WithTotal"
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/ActivityLogs/getActivityLogForGroups.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/logged-in-user": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get User Info (Self)",
+        "description": "Get info for user associated with the provided authentication token.",
+        "operationId": "getUserByLoggedInUser",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User info",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/User" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/User/getUserByLoggedInUser.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/transactions/{subAccountName}": {
+      "get": {
+        "tags": ["Financial"],
+        "summary": "Transactions",
+        "description": "Get transactions for a requested sub-account. Requires authorized user or admin authentication.",
+        "operationId": "getTransactions",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is 0.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1604188800000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": -1 },
+            "example": 1604760159
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TransactionResponse"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Financial/getTransactions.json"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Sub-account not found" },
+          "403": {
+            "description": "Forbidden. User does not have permission to view payments for this sub-account."
+          }
+        }
+      }
+    },
+    "/tags/{coinString}/{subAccountName}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Worker Tags",
+        "description": "Get worker tags. Requires permission to view hashrate.",
+        "operationId": "getTags",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns list of tags",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/TagsResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Workers/getTags.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/taggedWorkerCount/{coinString}/{subAccountName}": {
+      "get": {
+        "tags": ["Workers"],
+        "summary": "Get Tagged Worker Count",
+        "description": "Get the number of workers tagged by sub-account id and coinstring. Requires permission to view hashrate.",
+        "operationId": "getTaggedWorkerCount",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Returns the number of workers tagged for the specified subAccount and coin",
+            "content": {
+              "application/json": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 100
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have View Hashrate permission."
+          }
+        }
+      }
+    },
+    "/subaccount_stats/{subAccountName}": {
+      "get": {
+        "tags": ["Sub-Account"],
+        "summary": "Sub-Account Stats",
+        "description": "Get sub-account stats. Requires permission to view hashrate.",
+        "operationId": "getSubAccountStats",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account Name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "tagName",
+            "in": "query",
+            "description": "Name of requested tag. Default value is all.",
+            "required": false,
+            "schema": { "type": "string", "default": "all" },
+            "example": "all"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubAccountStatsWithoutOwnersResponse"
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/getSubAccountStats.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requires permission to view hashrate for this subaccount"
+          },
+          "404": {
+            "description": "Not Found: Cannot find subaccount with the name provided"
+          }
+        }
+      }
+    },
+    "/subaccount_hashrate_hour/{subAccountName}": {
+      "get": {
+        "tags": ["Sub-Account"],
+        "summary": "Hashrate Per Hour",
+        "description": "Get sub-account hashrate per hour for a requested date range & coin. Requires permission to view hashrate.",
+        "operationId": "getSubAccountHashrate",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in yyyy-MM-ddThh:mm:ss.SSS string format. Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-27T18:00:00.000"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in yyyy-MM-ddThh:mm:ss.SSS string format. Default value is current time.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-27T19:00:00.000"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1719511200000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1719514800000
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/getSubAccountHashratePerHour.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requires viewPayments permissions for this sub account."
+          },
+          "404": { "description": "Not Found: sub-account not found." }
+        }
+      }
+    },
+    "/subaccount_hashrate_day/{subAccountName}": {
+      "get": {
+        "tags": ["Sub-Account"],
+        "summary": "Hashrate Per Day",
+        "description": "Get sub-account hashrate and average active workers per day for a requested date range & coin. Requires permission to view hashrate. Note: Average Workers would be -1.0 for the current UTC day and also if the calculation is pending.",
+        "operationId": "getSubAccountHashrate_1",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is 30 days ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-27"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current day.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-28"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/getSubAccountHashratePerDay.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Requires viewPayments permissions for this sub account."
+          },
+          "404": { "description": "Not Found: Sub account not found." }
+        }
+      }
+    },
+    "/pool_stats": {
+      "get": {
+        "tags": ["Pool"],
+        "summary": "Pool Stats",
+        "description": "Get pool stats.  No authentication required.",
+        "operationId": "getPoolStats",
+        "parameters": [
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PoolStats" },
+                "examples": {
+                  "Success Example": {
+                    "description": "Success Example",
+                    "externalValue": "/assets/responseExamples/Pool/getPoolStats.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pool_hashrate_day": {
+      "get": {
+        "tags": ["Pool"],
+        "summary": "Pool Hashrate Per Day",
+        "description": "Get pool hashrate and PPS per day for a requested date range & coin.",
+        "operationId": "getPoolHashrate",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is 30 days ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-17"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current day.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-06-19"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/HashrateWithPpsBaseAmountResponse"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Pool/getPoolHashrateDay.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": { "description": "Forbidden: Not authenticated." }
+        }
+      }
+    },
+    "/pool_hashrate": {
+      "get": {
+        "tags": ["Pool"],
+        "summary": "Pool Hashrate",
+        "description": "Get pool hashrate (24 hour avg in GH/s). No authentication required.",
+        "operationId": "getPoolHashrate_1",
+        "parameters": [
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "*/*": {
+                "schema": { "type": "string" },
+                "example": "172571468492"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/granted_subaccounts": {
+      "get": {
+        "tags": ["Sub-Accounts"],
+        "summary": "Get Granted Sub-Accounts",
+        "description": "Get all active sub-account names the logged-in user has access to, as well as their sub-account role info, grouped by group name",
+        "operationId": "getGrantedSubAccounts",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantedSubAccountListResponse"
+                  }
+                },
+                "examples": {
+                  "Granted Sub-Accounts Response": {
+                    "description": "Granted Sub-Accounts Response",
+                    "externalValue": "/assets/responseExamples/SubAccounts/grantedSubAccounts.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires basic user permissions"
+          }
+        }
+      }
+    },
+    "/granted_subaccount_stats/{userId}": {
+      "get": {
+        "tags": ["Sub-Account"],
+        "summary": "Granted Sub-Account Stats",
+        "description": "Get stats for sub-accounts that the user owns or has granted access to. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.",
+        "operationId": "getGrantedSubAccountStats",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID is optional. Defaults to logged in user.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 1
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Valid values are \"highestHashrate\" or \"subAccountName\".",
+            "required": false,
+            "schema": { "type": "string", "default": "subAccountName" },
+            "example": "highestHashrate"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "List of group ids.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2, 3]
+          },
+          {
+            "name": "archived",
+            "in": "query",
+            "description": "Optional boolean which determines if archived sub-accounts should be included. Defaults to false.",
+            "required": false,
+            "schema": { "type": "boolean", "default": false },
+            "example": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success: Returns sub-account stats the user has been granted access to",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubAccountStatsWithRoleResponse"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccount/getGrantedSubAccountStats.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User does not have access to group"
+          },
+          "404": {
+            "description": "Not Found: Cannot find group ID provided | Cannot find user with the ID provided"
+          }
+        }
+      }
+    },
+    "/get_role/{subAccountName}/{userId}": {
+      "get": {
+        "tags": ["User"],
+        "summary": "Get a Users Role for a Sub-Account",
+        "description": "Get the role of a user for a sub-account.",
+        "operationId": "getRoleInfoBySubAccountNameAndUserId",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "The name of the sub-account",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "The ID of the user is optional. Defaults to logged in user.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 1
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK: Returns the role of the user for the sub-account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserSubAccountRoleResponse"
+                },
+                "examples": {
+                  "Owner Role": {
+                    "description": "Owner Role",
+                    "externalValue": "/assets/responseExamples/User/getRoleInfoOwner.json"
+                  },
+                  "Technician Role": {
+                    "description": "Technician Role",
+                    "externalValue": "/assets/responseExamples/User/getRoleInfoTechnician.json"
+                  },
+                  "Accountant Role": {
+                    "description": "Accountant Role",
+                    "externalValue": "/assets/responseExamples/User/getRoleInfoAccountant.json"
+                  },
+                  "Approver Role": {
+                    "description": "Approver Role",
+                    "externalValue": "/assets/responseExamples/User/getRoleInfoApprover.json"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found: No userSubAccountRole entry present with userId and sub-account"
+          }
+        }
+      }
+    },
+    "/financial_overview/{userId}": {
+      "get": {
+        "tags": ["Financial"],
+        "summary": "Financial Overview",
+        "description": "Get financial stats and their total for sub-accounts associated with a user. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.",
+        "operationId": "getFinancialStatsForSubAccounts",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID is optional. Defaults to logged in user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 123
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is 0. Specify UTC start of the day epoch time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1719360000000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": -1 },
+            "example": 1719446400000
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "List of group ids.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubAccountsFinancialStatsResponse"
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Financial/getFinancialStatsForSubAccounts.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden, User does not have access to group provided in groupIdsList."
+          }
+        }
+      }
+    },
+    "/earnings/{subAccountName}": {
+      "get": {
+        "tags": ["Financial"],
+        "summary": "Daily Earnings",
+        "description": "Get daily aggregated earnings for a requested sub-account. Requires authorized user or admin authentication.",
+        "operationId": "getEarnings",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is 0.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1604587359
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": -1 },
+            "example": 1604760159
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/EarningResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Financial/getEarnings.json"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Sub-account not found" },
+          "403": {
+            "description": "Forbidden. User does not have permission to view payments for this sub-account."
+          }
+        }
+      }
+    },
+    "/cumulated_subaccount_hashrate_hour/{userId}": {
+      "get": {
+        "tags": ["Sub-Accounts"],
+        "summary": "Cumulated Hashrate Per Hour for Granted Sub-Accounts",
+        "description": "Get cumulative hashrate per hour for all granted sub-accounts that the user owns or has been granted access to, for a requested date range & coin. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.",
+        "operationId": "getCumulativeGrantedSubAccountsHashrate",
+        "parameters": [
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID argument is optional. Defaults to logged in user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 1
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2020-11-07"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current time.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2020-11-08"
+          },
+          {
+            "name": "startDateUnixMs",
+            "in": "query",
+            "description": "Start date inclusive, in unix epoch time (milliseconds). Default value is one week ago.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1719529200000
+          },
+          {
+            "name": "endDateUnixMs",
+            "in": "query",
+            "description": "End date inclusive, in unix epoch time (milliseconds). Default value is current time.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64", "default": 0 },
+            "example": 1719532800000
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "Optional list of group IDs to filter by.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2, 3]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccounts/getCumulativeGrantedSubAccountsHashratePerHour.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User is not in one of the groups that was passed."
+          },
+          "404": { "description": "Not Found: Group with ID not found" }
+        }
+      }
+    },
+    "/cumulated_subaccount_hashrate_day/{userId}": {
+      "get": {
+        "tags": ["Sub-Accounts"],
+        "summary": "Cumulated Hashrate Per Day for Granted Sub-Accounts",
+        "description": "Get cumulative hashrate per day for all granted sub-accounts that the user owns or has been granted access to, for a requested date range & coin. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.",
+        "operationId": "getCumulativeGrantedSubAccountsHashrate_1",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID argument is optional. Defaults to logged in user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 1
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "description": "Start date inclusive, in YYYY-MM-DD string format. Default value is 30 days ago.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-29"
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "description": "End date inclusive, in YYYY-MM-DD string format. Default value is current day.",
+            "required": false,
+            "schema": { "type": "string", "default": "" },
+            "example": "2024-05-30"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "Optional list of group IDs to filter by.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2, 3]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/HashrateResponse" }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccounts/getCumulativeGrantedSubAccountsHashratePerDay.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User is not in one of the groups that was passed."
+          },
+          "404": { "description": "Not Found: Group with ID not found." }
+        }
+      }
+    },
+    "/cumulated_granted_subaccount_stats/{userId}": {
+      "get": {
+        "tags": ["Sub-Accounts"],
+        "summary": "Cumulated Granted Sub-Account Stats",
+        "description": "Get cumulated stats for sub-accounts that the user owns or has granted access to. User authentication required to see their own granted sub-accounts. Admin authentication with read permission required to see other users granted sub-accounts.",
+        "operationId": "getCumulativeGrantedSubAccountStats",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID argument is optional. Defaults to logged in user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 1
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "Optional list of group IDs to filter by.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2, 3]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CumulativeSubAccountStats"
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/SubAccounts/getCumulativeGrantedSubAccountStats.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User is not in one of the groups that was passed."
+          },
+          "404": { "description": "Not Found: Group with ID not found" }
+        }
+      }
+    },
+    "/coins": {
+      "get": {
+        "tags": ["Coins"],
+        "summary": "List Supported Coins",
+        "description": "Get list of coins on the pool. No authentication required.",
+        "operationId": "getCoins",
+        "responses": {
+          "200": {
+            "description": "List of coins on the pool",
+            "content": {
+              "application/json": {
+                "schema": { "type": "array", "items": { "type": "string" } },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Coins/coins.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/balance/{subAccountName}": {
+      "get": {
+        "tags": ["Financial"],
+        "summary": "Balance Info",
+        "description": "Get balance, total earned, total fees and total withdrawn amount for a requested sub-account. Requires authorized user or admin authentication.",
+        "operationId": "getBalanceInfo",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-Account name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coin",
+            "in": "query",
+            "description": "Name of requested coin. Default value is BTC.",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/BalanceResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Financial/getBalanceInfo.json"
+                  }
+                }
+              }
+            }
+          },
+          "404": { "description": "Sub-account not found" },
+          "403": {
+            "description": "Forbidden. User does not have permission to view payments for this sub-account."
+          }
+        }
+      }
+    },
+    "/authentication_test": {
+      "get": {
+        "tags": ["Authentication"],
+        "summary": "Authentication Test",
+        "description": "Please follow these instructions for all endpoints that require authentication. You may generate an API key by creating a \"Viewer Link\" in the pool Sub-Accounts page. Use either an API key or access token (not both) to authenticate. API Keys are intended for pool customers while access tokens are intended for internal use.",
+        "operationId": "authenticationTest",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK, Your role is returned",
+            "content": {
+              "*/*": {
+                "schema": { "type": "string" },
+                "example": "Authentication with API key succeeded. Your role is Viewer."
+              }
+            }
+          },
+          "403": { "description": "Not Authenticated" }
+        }
+      }
+    },
+    "/alerts/subaccount_alerts/{userId}": {
+      "get": {
+        "tags": ["Alerts"],
+        "summary": "Get All Alerts",
+        "description": "Get alerts for all sub-accounts in selected group id(s) or in all the user's groups, if no group ids are submitted in request. Requires permission to view hashrate.",
+        "operationId": "getSubAccountAlerts",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token. Not required if using API key.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "X-API-KEY",
+            "in": "header",
+            "description": "API key. Not required if using access token.",
+            "required": false,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID is optional. Defaults to logged in user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": 123
+          },
+          {
+            "name": "coinString",
+            "in": "query",
+            "description": "Coin",
+            "required": false,
+            "schema": { "type": "string", "default": "BTC" },
+            "example": "BTC"
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "List of group ids.",
+            "required": false,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            }
+          },
+          {
+            "name": "triggeredOnly",
+            "in": "query",
+            "description": "triggeredOnly is optional. It's a boolean that determines if all alerts are returned or only triggered alerts. Defaults to 'false' so all alerts are returned.",
+            "required": false,
+            "schema": { "type": "boolean", "default": false },
+            "example": "BTC"
+          },
+          {
+            "name": "pageNumber",
+            "in": "query",
+            "description": "Valid values are 0 and positive integers. Default value is 0.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": 0 },
+            "example": 2
+          },
+          {
+            "name": "pageSize",
+            "in": "query",
+            "description": "Valid values are -1 (representing max size) and positive integers. Default value is -1.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int32", "default": -1 },
+            "example": 10
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Valid values are \"ascSubAccount\" and \"descSubAccount\". Default value is ascSubAccount.",
+            "required": false,
+            "schema": { "type": "string", "default": "ascSubAccount" },
+            "example": "ascSubAccount"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns a list of all or 'triggered only' alerts for sub-accounts in one or more groups and coin.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AlertsListResponse" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/Alerts/getSubAccountAlerts.json"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden: User does not have access to group with id <groupId>"
+          },
+          "400": {
+            "description": "Bad Request: Duplicated group entry - <groupId>"
+          },
+          "404": {
+            "description": "Not Found: Group with id <groupId> does not exist"
+          }
+        }
+      }
+    },
+    "/activity_log/activity_types": {
+      "get": {
+        "tags": ["Activity Logs"],
+        "summary": "Get Available Activity Log Types",
+        "description": "Get list of activities types that are currently being logged by the pool.",
+        "operationId": "getActivityLogTypes",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of available activity types",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ActivityTypesEnumResponse"
+                  }
+                },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/ActivityLogs/getActivityLogTypes.json"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/access_token": {
+      "get": {
+        "tags": ["Access Token"],
+        "summary": "Get Access Token",
+        "description": "Returns the access token for a specific user. Requires API User permission.",
+        "operationId": "getAccessToken",
+        "parameters": [
+          {
+            "name": "Email-Address",
+            "in": "header",
+            "description": "Email address of the user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "satoshinakamoto@foundry.com"
+          },
+          {
+            "name": "Password",
+            "in": "header",
+            "description": "Password of the user",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "password123"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successfully Authenticated",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/AccessToken" },
+                "examples": {
+                  "Success Response": {
+                    "description": "Success Response",
+                    "externalValue": "/assets/responseExamples/AccessTokens/accessToken.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad Request" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "User Not Found" }
+        }
+      }
+    },
+    "/workers/{subAccountName}/{coinString}": {
+      "delete": {
+        "tags": ["Workers"],
+        "summary": "Delete Workers",
+        "description": "Delete workers for a sub-account by providing a list of worker ids OR by providing a last share time timestamp in milliseconds. Requires sub-account owner authentication.",
+        "operationId": "deleteWorkersBySubAccountNameAndWorkerIds",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of requested sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Name of requested coin.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "lastShareTime",
+            "in": "query",
+            "description": "Timestamp in Unix milliseconds. Must be at least 15 minutes before current time. Workers whose last share time is equal to or older than this timestamp will be deleted.",
+            "required": false,
+            "schema": { "type": "integer", "format": "int64" },
+            "example": 1622714400000
+          }
+        ],
+        "requestBody": {
+          "description": "Optional list of worker ids to be deleted.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "type": "integer", "format": "int64" }
+              },
+              "examples": {
+                "Request Body Example": {
+                  "description": "Request Body Example",
+                  "externalValue": "/assets/requestBodyExamples/Workers/workerIdList.json"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success, Returns Number of workers deleted.",
+            "content": {
+              "*/*": {
+                "schema": { "type": "integer", "format": "int32" },
+                "example": 3
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: A list of worker ids or a lastShareTime is required."
+          },
+          "403": {
+            "description": "Forbidden: Requester doesn't have Worker Edit permission for SubAccount"
+          },
+          "404": { "description": "Not Found: sub-account not found" }
+        }
+      }
+    },
+    "/v2/users/{userId}": {
+      "delete": {
+        "tags": ["User"],
+        "summary": "Deactivate User Associated With a List of Groups or Create Approval Request for the same",
+        "description": "Deactivate user associated with a list of groups or Create Approval Request to do so. Requires mining account owner authentication or admin write authentication.",
+        "operationId": "deactivateUser",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "Id of the user to be deactivated",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1794
+          },
+          {
+            "name": "groupIdsList",
+            "in": "query",
+            "description": "List of group IDs to deactivate the user from",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": { "type": "integer", "format": "int32" }
+            },
+            "example": [1, 2]
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "UserResponse of deactivated user",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/UserResponseV2" },
+                "examples": {
+                  "Deactivated User Response": {
+                    "description": "Deactivated User Response",
+                    "externalValue": "/assets/responseExamples/User/deactivatedUserAndApprovalRequest.json"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request: Admin's access cannot be updated or deactivated. | At least one group id must be provided."
+          },
+          "403": {
+            "description": "Forbidden: Insufficient privileges. Requires mining account owner or higher; User is already inactive; Users cannot deactivate themselves.; User cannot be modified because the group <group_name>'s approval threshold is equal to the number of approvers in group."
+          }
+        }
+      }
+    },
+    "/tags/untag/{coinString}/{subAccountName}": {
+      "delete": {
+        "tags": ["Workers"],
+        "summary": "Untag Workers",
+        "description": "Untag a list of workers. Requires permission to edit workers.",
+        "operationId": "untagWorkers",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin string. valid values are \"BTC\" or \"BCH\"",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub-account name associated with the tag",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          }
+        ],
+        "requestBody": {
+          "description": "List of worker ids to be untagged",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": { "type": "integer", "format": "int64" }
+              },
+              "examples": {
+                "Request Body Example": {
+                  "description": "Request Body Example",
+                  "externalValue": "/assets/requestBodyExamples/Workers/workerIdList.json"
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": { "description": "No Content: Untag successful" },
+          "403": {
+            "description": "Forbidden: Requester doesn't have Worker Edit permission for sub-account."
+          },
+          "404": { "description": "Not Found: Cannot find sub-account" }
+        }
+      }
+    },
+    "/api_keys/{subAccountName}/{apiKey}": {
+      "delete": {
+        "tags": ["Sub-Account Settings"],
+        "summary": "Delete API Key",
+        "description": "Delete an API key for a given sub-account. Requires permission to view hashrate.",
+        "operationId": "deleteApiKey",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Name of sub-account.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subAccount1"
+          },
+          {
+            "name": "apiKey",
+            "in": "path",
+            "description": "API key to delete.",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          }
+        ],
+        "responses": {
+          "204": { "description": "No Content. API key deleted." },
+          "403": {
+            "description": "Forbidden. User does not have permission to manage API keys for this subaccount."
+          },
+          "404": { "description": "Not Found. Sub-account does not exist." }
+        }
+      }
+    },
+    "/alerts/{coinString}/{subAccountName}/{alertId}": {
+      "delete": {
+        "tags": ["Alerts"],
+        "summary": "Delete Alert",
+        "description": "Delete an alert. Requires permission to view hashrate.",
+        "operationId": "deleteAlert",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "description": "OAuth2.0 access token.",
+            "schema": { "type": "string" },
+            "example": "Bearer [access token]"
+          },
+          {
+            "name": "coinString",
+            "in": "path",
+            "description": "Coin",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "BTC"
+          },
+          {
+            "name": "subAccountName",
+            "in": "path",
+            "description": "Sub Account Name",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "subaccount1"
+          },
+          {
+            "name": "alertId",
+            "in": "path",
+            "description": "Alert ID",
+            "required": true,
+            "schema": { "type": "integer", "format": "int32" },
+            "example": 1
+          }
+        ],
+        "responses": { "204": { "description": "No Content" } }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "WalletResponse": {
+        "type": "object",
+        "properties": {
+          "address": { "type": "string" },
+          "label": { "type": "string" },
+          "status": { "type": "string" },
+          "allocationPercent": { "type": "number" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "isAutoWithdraw": { "type": "boolean" },
+          "subAccountWalletId": { "type": "integer", "format": "int32" },
+          "approvalRequestId": { "type": "integer", "format": "int32" },
+          "isApprovalActionRequired": { "type": "boolean" },
+          "approvalThreshold": { "type": "integer", "format": "int32" },
+          "approvers": { "type": "string" }
+        },
+        "required": [
+          "address",
+          "allocationPercent",
+          "createdAt",
+          "isApprovalActionRequired",
+          "isAutoWithdraw",
+          "label",
+          "status"
+        ]
+      },
+      "UserGroupResponse": {
+        "type": "object",
+        "properties": {
+          "groupName": { "type": "string" },
+          "roleName": { "type": "string" },
+          "defaultSubAccountRoleName": { "type": "string" },
+          "approvalRequestId": { "type": "integer", "format": "int32" },
+          "isApprovalActionRequired": { "type": "boolean" },
+          "approvalThreshold": { "type": "integer", "format": "int32" },
+          "approvalStatus": { "type": "string" },
+          "approvers": { "type": "string" },
+          "approvalActionRequired": { "type": "boolean", "writeOnly": true }
+        },
+        "required": [
+          "defaultSubAccountRoleName",
+          "groupName",
+          "isApprovalActionRequired",
+          "roleName"
+        ]
+      },
+      "UserResponseV2": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "emailAddress": { "type": "string" },
+          "fullName": { "type": "string" },
+          "groups": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserGroupResponse" },
+            "uniqueItems": true
+          }
+        },
+        "required": ["emailAddress", "fullName"]
+      },
+      "AddUserToSubAccountRequest": {
+        "type": "object",
+        "properties": { "userRoleName": { "type": "string" } }
+      },
+      "GroupThresholdUpdateResponse": {
+        "type": "object",
+        "properties": {
+          "groupName": { "type": "string" },
+          "newApprovalThreshold": { "type": "integer", "format": "int32" },
+          "approvalRequestId": { "type": "integer", "format": "int32" },
+          "isApprovalActionRequired": { "type": "boolean" },
+          "approvalsRequired": { "type": "integer", "format": "int32" },
+          "status": { "type": "string" },
+          "approvers": { "type": "string" },
+          "approvalActionRequired": { "type": "boolean", "writeOnly": true }
+        },
+        "required": [
+          "groupName",
+          "isApprovalActionRequired",
+          "newApprovalThreshold"
+        ]
+      },
+      "WalletAllocationRequest": {
+        "type": "object",
+        "properties": {
+          "subAccountWalletId": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Sub Account Wallet id of the wallet",
+            "example": 1
+          },
+          "allocationPercent": {
+            "type": "number",
+            "description": "Allocation percentage for this wallet. Up to 3 decimals of precision.",
+            "example": 49.001
+          },
+          "autoWithdraw": {
+            "type": "boolean",
+            "description": "Auto Withdraw toggle",
+            "example": true
+          }
+        },
+        "required": ["allocationPercent", "autoWithdraw", "subAccountWalletId"]
+      },
+      "NewUserRequestV2": {
+        "type": "object",
+        "properties": {
+          "emailAddress": {
+            "type": "string",
+            "description": "Email Address of user"
+          },
+          "fullName": {
+            "type": "string",
+            "description": "Full Name of new user - blank if adding an existing user to a group."
+          },
+          "preferredName": {
+            "type": "string",
+            "description": "Preferred Name for new user - blank if adding an existing user to a group."
+          },
+          "groups": {
+            "type": "array",
+            "description": "List of UserGroupRequest objects",
+            "items": { "$ref": "#/components/schemas/UserGroupRequest" }
+          },
+          "apiUser": {
+            "type": "boolean",
+            "default": "false",
+            "description": "True for API-Only users."
+          },
+          "ips": {
+            "type": "array",
+            "description": "List of API User's IPs. Only valid if apiUser equals true.",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          },
+          "subAccountNames": {
+            "type": "array",
+            "description": "List of sub-accounts to add the user to. If null, user will be added to all sub-accounts",
+            "items": { "type": "string" },
+            "uniqueItems": true
+          }
+        },
+        "required": ["emailAddress", "fullName", "groups", "preferredName"]
+      },
+      "UserGroupRequest": {
+        "type": "object",
+        "properties": {
+          "groupName": {
+            "type": "string",
+            "description": "The name of the group"
+          },
+          "subaccountRoleName": {
+            "type": "string",
+            "description": "Role of new user for that group. Valid values are \"owner\", \"accountant\" or \"technician\""
+          }
+        },
+        "required": ["groupName", "subaccountRoleName"]
+      },
+      "SubAccountAccessRequest": {
+        "type": "object",
+        "properties": {
+          "userSubAccountAccess": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserSubAccountAccessRequest"
+            }
+          }
+        },
+        "required": ["userSubAccountAccess"]
+      },
+      "UserSubAccountAccessRequest": {
+        "type": "object",
+        "properties": {
+          "userId": { "type": "integer", "format": "int32" },
+          "subAccountRole": { "type": "string" }
+        }
+      },
+      "WorkerResponse": {
+        "type": "object",
+        "properties": {
+          "workerId": { "type": "string" },
+          "workerName": { "type": "string" },
+          "hashrate_5m": { "type": "integer", "format": "int64" },
+          "hashrate_15m": { "type": "integer", "format": "int64" },
+          "stale_15m": { "type": "integer", "format": "int64" },
+          "stale15mPercent": { "type": "number", "format": "double" },
+          "reject_15m": { "type": "integer", "format": "int64" },
+          "reject15mPercent": { "type": "number", "format": "double" },
+          "rejectDetail_15m": { "type": "string" },
+          "hashrate_1h": { "type": "integer", "format": "int64" },
+          "stale_1h": { "type": "integer", "format": "int64" },
+          "reject_1h": { "type": "integer", "format": "int64" },
+          "rejectDetail_1h": { "type": "string" },
+          "lastShareTime": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "tag": { "type": "string" }
+        },
+        "required": [
+          "hashrate_15m",
+          "hashrate_1h",
+          "hashrate_5m",
+          "lastShareTime",
+          "reject15mPercent",
+          "rejectDetail_15m",
+          "rejectDetail_1h",
+          "reject_15m",
+          "reject_1h",
+          "stale15mPercent",
+          "stale_15m",
+          "stale_1h",
+          "tag",
+          "workerId",
+          "workerName"
+        ]
+      },
+      "WorkersResponse": {
+        "type": "object",
+        "properties": {
+          "workersList": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/WorkerResponse" }
+          },
+          "totalWorkerCount": { "type": "integer", "format": "int64" }
+        },
+        "required": ["totalWorkerCount", "workersList"]
+      },
+      "WorkerCounts": {
+        "type": "object",
+        "properties": {
+          "workerCount": { "type": "integer", "format": "int32" },
+          "offline15MinWorkerCount": { "type": "integer", "format": "int32" },
+          "offline24HrWorkerCount": { "type": "integer", "format": "int32" }
+        },
+        "required": [
+          "offline15MinWorkerCount",
+          "offline24HrWorkerCount",
+          "workerCount"
+        ]
+      },
+      "HashrateResponse": {
+        "type": "object",
+        "properties": {
+          "time": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "unixTime": { "type": "integer", "format": "int64" },
+          "hashrateAccepted": { "type": "integer", "format": "int64" },
+          "hashrateStale": { "type": "integer", "format": "int64" },
+          "hashrateRejected": { "type": "integer", "format": "int64" },
+          "averageWorkers": { "type": "number", "format": "double" }
+        },
+        "required": [
+          "hashrateAccepted",
+          "hashrateRejected",
+          "hashrateStale",
+          "time",
+          "unixTime"
+        ]
+      },
+      "WalletsResponse": {
+        "type": "object",
+        "properties": {
+          "walletList": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/WalletResponse" }
+          }
+        },
+        "required": ["walletList"]
+      },
+      "GroupWithUsersResponseV2": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "name": { "type": "string" },
+          "users": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserResponse" }
+          }
+        },
+        "required": ["name", "users"]
+      },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "emailAddress": { "type": "string" },
+          "fullName": { "type": "string" },
+          "groupName": { "type": "string" },
+          "roleName": { "type": "string" },
+          "approvalRequestId": { "type": "integer", "format": "int32" },
+          "isApprovalActionRequired": { "type": "boolean" },
+          "approvalThreshold": { "type": "integer", "format": "int32" },
+          "status": { "type": "string" },
+          "approvers": { "type": "string" },
+          "approvalActionRequired": { "type": "boolean", "writeOnly": true }
+        },
+        "required": [
+          "emailAddress",
+          "fullName",
+          "groupName",
+          "isApprovalActionRequired",
+          "roleName"
+        ]
+      },
+      "ActivityLogEntryV2": {
+        "type": "object",
+        "properties": {
+          "userType": { "type": "string" },
+          "groupId": { "type": "integer", "format": "int32" },
+          "userEmail": { "type": "string" },
+          "ip": { "type": "string" },
+          "subAccount": { "type": "string" },
+          "coin": { "type": "string" },
+          "activityType": { "type": "string" },
+          "activityDetails": { "type": "string" },
+          "activityAt": { "type": "string", "format": "date-time" },
+          "description": { "type": "string" }
+        },
+        "required": [
+          "activityAt",
+          "activityDetails",
+          "activityType",
+          "description",
+          "ip"
+        ]
+      },
+      "ActivityLogResponseV2": {
+        "type": "object",
+        "properties": {
+          "activityLogs": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ActivityLogEntryV2" }
+          },
+          "totalLogCount": { "type": "integer", "format": "int64" },
+          "groupName": { "type": "string" }
+        },
+        "required": ["activityLogs", "groupName", "totalLogCount"]
+      },
+      "ActivityLogResponseV2WithTotal": {
+        "type": "object",
+        "properties": {
+          "activityLogResponses": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ActivityLogResponseV2" }
+          },
+          "totalLogs": { "type": "integer", "format": "int64" }
+        },
+        "required": ["activityLogResponses", "totalLogs"]
+      },
+      "AdminRole": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "roleName": { "type": "string" },
+          "adminRead": { "type": "boolean" },
+          "adminWrite": { "type": "boolean" }
+        },
+        "required": ["adminRead", "adminWrite", "id", "roleName"]
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "name": { "type": "string" },
+          "ppsFeeRate": { "type": "number" },
+          "approvalThreshold": { "type": "integer", "format": "int32" }
+        },
+        "required": ["approvalThreshold", "id", "name", "ppsFeeRate"]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "emailAddress": { "type": "string" },
+          "fullName": { "type": "string" },
+          "preferredName": { "type": "string" },
+          "isActive": { "type": "boolean" },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "groups": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserGroup" },
+            "uniqueItems": true
+          },
+          "authId": { "type": "string" },
+          "adminRole": { "$ref": "#/components/schemas/AdminRole" },
+          "active": { "type": "boolean", "writeOnly": true }
+        },
+        "required": [
+          "adminRole",
+          "authId",
+          "createdAt",
+          "emailAddress",
+          "fullName",
+          "groups",
+          "id",
+          "isActive",
+          "preferredName",
+          "updatedAt"
+        ]
+      },
+      "UserGroup": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "group": { "$ref": "#/components/schemas/Group" },
+          "userRole": { "$ref": "#/components/schemas/UserRole" },
+          "defaultSubAccountRole": {
+            "$ref": "#/components/schemas/UserSubAccountRole"
+          },
+          "createdAt": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": [
+          "createdAt",
+          "defaultSubAccountRole",
+          "group",
+          "id",
+          "updatedAt",
+          "userRole"
+        ]
+      },
+      "UserRole": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "roleName": { "type": "string" },
+          "createSubAccounts": { "type": "boolean" },
+          "manageUsers": { "type": "boolean" },
+          "approve": { "type": "boolean" }
+        },
+        "required": [
+          "approve",
+          "createSubAccounts",
+          "id",
+          "manageUsers",
+          "roleName"
+        ]
+      },
+      "UserSubAccountRole": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "roleName": { "type": "string" },
+          "viewHashrate": { "type": "boolean" },
+          "viewPayments": { "type": "boolean" },
+          "withdraw": { "type": "boolean" },
+          "setRoles": { "type": "boolean" },
+          "editWorkers": { "type": "boolean" },
+          "manageApiKeys": { "type": "boolean" },
+          "approve": { "type": "boolean" }
+        },
+        "required": [
+          "approve",
+          "editWorkers",
+          "id",
+          "manageApiKeys",
+          "roleName",
+          "setRoles",
+          "viewHashrate",
+          "viewPayments",
+          "withdraw"
+        ]
+      },
+      "TransactionResponse": {
+        "type": "object",
+        "properties": {
+          "time": { "type": "string", "format": "date-time" },
+          "broadcastTime": { "type": "string", "format": "date-time" },
+          "amount": { "type": "number" },
+          "type": { "type": "string" },
+          "description": { "type": "string" },
+          "txId": { "type": "string" },
+          "address": { "type": "string" }
+        },
+        "required": ["amount", "description", "time", "type"]
+      },
+      "TagResponse": {
+        "type": "object",
+        "properties": {
+          "tagId": { "type": "integer", "format": "int32" },
+          "tagName": { "type": "string" }
+        },
+        "required": ["tagId", "tagName"]
+      },
+      "TagsResponse": {
+        "type": "object",
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/TagResponse" }
+          }
+        },
+        "required": ["tags"]
+      },
+      "SubAccountStatsWithoutOwnersResponse": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "activeWorkers": { "type": "integer", "format": "int32" },
+          "offline15MinWorkerCount": { "type": "integer", "format": "int32" },
+          "offline24HrWorkerCount": { "type": "integer", "format": "int32" },
+          "hashrate5minAvg": { "type": "integer", "format": "int64" },
+          "hashrate15minAvg": { "type": "integer", "format": "int64" },
+          "stale15minAvg": { "type": "integer", "format": "int64" },
+          "reject15minAvg": { "type": "integer", "format": "int64" },
+          "hashrate1hrAvg": { "type": "integer", "format": "int64" },
+          "hashrate24hrAvg": { "type": "integer", "format": "int64" },
+          "stale1hrAvg": { "type": "integer", "format": "int64" },
+          "reject1hrAvg": { "type": "integer", "format": "int64" },
+          "lastShareTime": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "fcmOptIn": { "type": "boolean" },
+          "isActive": { "type": "boolean" }
+        },
+        "required": [
+          "activeWorkers",
+          "fcmOptIn",
+          "hashrate15minAvg",
+          "hashrate1hrAvg",
+          "hashrate24hrAvg",
+          "hashrate5minAvg",
+          "isActive",
+          "lastShareTime",
+          "name",
+          "offline15MinWorkerCount",
+          "offline24HrWorkerCount",
+          "reject15minAvg",
+          "reject1hrAvg",
+          "stale15minAvg",
+          "stale1hrAvg",
+          "updatedAt"
+        ]
+      },
+      "PoolStats": {
+        "type": "object",
+        "properties": {
+          "activeWorkers": { "type": "integer", "format": "int32" },
+          "hashrate5minAvg": { "type": "integer", "format": "int64" },
+          "hashrate15minAvg": { "type": "integer", "format": "int64" },
+          "stale15minAvg": { "type": "integer", "format": "int64" },
+          "reject15minAvg": { "type": "integer", "format": "int64" },
+          "hashrate1hrAvg": { "type": "integer", "format": "int64" },
+          "hashrate24hrAvg": { "type": "integer", "format": "int64" },
+          "stale1hrAvg": { "type": "integer", "format": "int64" },
+          "reject1hrAvg": { "type": "integer", "format": "int64" },
+          "lastShareTime": { "type": "string" },
+          "updatedAt": { "type": "string" }
+        },
+        "required": [
+          "activeWorkers",
+          "hashrate15minAvg",
+          "hashrate1hrAvg",
+          "hashrate24hrAvg",
+          "hashrate5minAvg",
+          "lastShareTime",
+          "reject15minAvg",
+          "reject1hrAvg",
+          "stale15minAvg",
+          "stale1hrAvg",
+          "updatedAt"
+        ]
+      },
+      "HashrateWithPpsBaseAmountResponse": {
+        "type": "object",
+        "properties": {
+          "time": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "unixTime": { "type": "integer", "format": "int64" },
+          "hashrateAccepted": { "type": "integer", "format": "int64" },
+          "hashrateStale": { "type": "integer", "format": "int64" },
+          "hashrateRejected": { "type": "integer", "format": "int64" },
+          "pps": { "type": "number" }
+        },
+        "required": [
+          "hashrateAccepted",
+          "hashrateRejected",
+          "hashrateStale",
+          "pps",
+          "time",
+          "unixTime"
+        ]
+      },
+      "GrantedSubAccountListResponse": {
+        "type": "object",
+        "properties": {
+          "groupName": { "type": "string" },
+          "subAccountNamesAndRoles": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/SubAccountNameAndRole" }
+          }
+        },
+        "required": ["groupName", "subAccountNamesAndRoles"]
+      },
+      "SubAccountNameAndRole": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "role": { "type": "string" }
+        },
+        "required": ["name", "role"]
+      },
+      "SubAccountStatsWithRoleResponse": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "activeWorkers": { "type": "integer", "format": "int32" },
+          "offline15MinWorkerCount": { "type": "integer", "format": "int32" },
+          "offline24HrWorkerCount": { "type": "integer", "format": "int32" },
+          "hashrate5minAvg": { "type": "integer", "format": "int64" },
+          "hashrate15minAvg": { "type": "integer", "format": "int64" },
+          "stale15minAvg": { "type": "integer", "format": "int64" },
+          "reject15minAvg": { "type": "integer", "format": "int64" },
+          "hashrate1hrAvg": { "type": "integer", "format": "int64" },
+          "hashrate24hrAvg": { "type": "integer", "format": "int64" },
+          "stale1hrAvg": { "type": "integer", "format": "int64" },
+          "reject1hrAvg": { "type": "integer", "format": "int64" },
+          "lastShareTime": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" },
+          "role": { "type": "string" },
+          "subAccountUsers": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UserSubAccountResponse" }
+          },
+          "subAccountUsersPermission": { "type": "boolean" },
+          "groupId": { "type": "integer", "format": "int32" },
+          "groupName": { "type": "string" },
+          "fcmOptIn": { "type": "boolean" },
+          "isActive": { "type": "boolean" }
+        },
+        "required": [
+          "activeWorkers",
+          "fcmOptIn",
+          "groupId",
+          "groupName",
+          "hashrate15minAvg",
+          "hashrate1hrAvg",
+          "hashrate24hrAvg",
+          "hashrate5minAvg",
+          "isActive",
+          "lastShareTime",
+          "name",
+          "offline15MinWorkerCount",
+          "offline24HrWorkerCount",
+          "reject15minAvg",
+          "reject1hrAvg",
+          "role",
+          "stale15minAvg",
+          "stale1hrAvg",
+          "subAccountUsers",
+          "subAccountUsersPermission",
+          "updatedAt"
+        ]
+      },
+      "UserSubAccountResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer", "format": "int32" },
+          "userId": { "type": "integer", "format": "int32" },
+          "emailAddress": { "type": "string" },
+          "fullName": { "type": "string" },
+          "groupName": { "type": "string" },
+          "subAccountName": { "type": "string" },
+          "roleName": { "type": "string" },
+          "defaultSubAccountRoleName": { "type": "string" },
+          "approvalRequestId": { "type": "integer", "format": "int32" },
+          "isApprovalActionRequired": { "type": "boolean" },
+          "approvalThreshold": { "type": "integer", "format": "int32" },
+          "status": { "type": "string" },
+          "approvers": { "type": "string" }
+        },
+        "required": [
+          "defaultSubAccountRoleName",
+          "emailAddress",
+          "fullName",
+          "groupName",
+          "isApprovalActionRequired",
+          "roleName",
+          "subAccountName",
+          "userId"
+        ]
+      },
+      "UserSubAccountRoleResponse": {
+        "type": "object",
+        "properties": {
+          "roleName": { "type": "string" },
+          "viewHashrate": { "type": "boolean" },
+          "viewPayments": { "type": "boolean" },
+          "withdraw": { "type": "boolean" },
+          "setRoles": { "type": "boolean" },
+          "editWorkers": { "type": "boolean" },
+          "manageApiKeys": { "type": "boolean" },
+          "approve": { "type": "boolean" }
+        },
+        "required": [
+          "approve",
+          "editWorkers",
+          "manageApiKeys",
+          "roleName",
+          "setRoles",
+          "viewHashrate",
+          "viewPayments",
+          "withdraw"
+        ]
+      },
+      "BalanceResponse": {
+        "type": "object",
+        "properties": {
+          "balance": { "type": "number" },
+          "totalEarned": { "type": "number" },
+          "totalFCMFees": { "type": "number" },
+          "totalDebits": { "type": "number" },
+          "totalFees": { "type": "number" },
+          "totalWithdrawn": { "type": "number" }
+        },
+        "required": [
+          "balance",
+          "totalDebits",
+          "totalEarned",
+          "totalFCMFees",
+          "totalFees",
+          "totalWithdrawn"
+        ]
+      },
+      "SubAccountFinancialStatsResponse": {
+        "type": "object",
+        "properties": {
+          "statsDate": { "type": "string", "format": "date-time" },
+          "subAccountName": { "type": "string" },
+          "hashratePrevDay": { "type": "integer", "format": "int64" },
+          "ppsBaseAmount": { "type": "number" },
+          "txFeeRewardAmount": { "type": "number" },
+          "feeAmount": { "type": "number" },
+          "totalEarnedInDuration": { "type": "number" },
+          "totalFeesInDuration": { "type": "number" },
+          "totalWithdrawnInDuration": { "type": "number" },
+          "earningsInfo": { "$ref": "#/components/schemas/BalanceResponse" },
+          "autoWithdraw": { "type": "boolean" },
+          "groupId": { "type": "integer", "format": "int32" },
+          "groupName": { "type": "string" }
+        },
+        "required": [
+          "autoWithdraw",
+          "earningsInfo",
+          "feeAmount",
+          "groupId",
+          "groupName",
+          "hashratePrevDay",
+          "ppsBaseAmount",
+          "statsDate",
+          "subAccountName",
+          "totalEarnedInDuration",
+          "totalFeesInDuration",
+          "totalWithdrawnInDuration",
+          "txFeeRewardAmount"
+        ]
+      },
+      "SubAccountsFinancialStatsResponse": {
+        "type": "object",
+        "properties": {
+          "subAccountFinancialStatsList": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SubAccountFinancialStatsResponse"
+            }
+          },
+          "totalOfSubAccountStats": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TotalStatsForSubAccountGroup"
+            }
+          }
+        },
+        "required": ["subAccountFinancialStatsList", "totalOfSubAccountStats"]
+      },
+      "TotalStatsForSubAccountGroup": {
+        "type": "object",
+        "properties": {
+          "statsDate": {
+            "type": "string",
+            "description": "The day in which the stats were calculated."
+          },
+          "totalHashratePrevDay": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Total hashrate across subaccounts in the last 24 hours."
+          },
+          "totalPpsBaseAmount": {
+            "type": "number",
+            "description": "Total PPS base amount in the last 24 hours."
+          },
+          "totalTxFeeRewardAmount": {
+            "type": "number",
+            "description": "Total tx fee reward amount in the last 24 hours."
+          },
+          "totalFeeAmount": {
+            "type": "number",
+            "description": "Total fee amount in the last 24 hours."
+          },
+          "totalEarnedInDuration": {
+            "type": "number",
+            "description": "Total earned for group in the last 24 hours."
+          },
+          "totalFeesInDuration": {
+            "type": "number",
+            "description": "Total fees paid in the last 24 hours."
+          },
+          "totalWithdrawnInDuration": {
+            "type": "number",
+            "description": "Total withdrawn in the last 24 hours."
+          },
+          "totalEarnedToDate": {
+            "type": "number",
+            "description": "Total earned for group until the present time"
+          },
+          "totalFeesToDate": {
+            "type": "number",
+            "description": "Total fees paid until the present time."
+          },
+          "totalWithdrawnToDate": {
+            "type": "number",
+            "description": "Total withdrawn until the present time."
+          },
+          "balanceToDate": {
+            "type": "number",
+            "description": "Total balance until the present time."
+          }
+        },
+        "required": [
+          "balanceToDate",
+          "statsDate",
+          "totalEarnedInDuration",
+          "totalEarnedToDate",
+          "totalFeeAmount",
+          "totalFeesInDuration",
+          "totalFeesToDate",
+          "totalHashratePrevDay",
+          "totalPpsBaseAmount",
+          "totalTxFeeRewardAmount",
+          "totalWithdrawnInDuration",
+          "totalWithdrawnToDate"
+        ]
+      },
+      "EarningResponse": {
+        "type": "object",
+        "properties": {
+          "startTime": { "type": "string", "format": "date-time" },
+          "endTime": { "type": "string", "format": "date-time" },
+          "totalAmount": { "type": "number" },
+          "hashrate": { "type": "integer", "format": "int64" },
+          "ppsBaseAmount": { "type": "number" },
+          "txFeeRewardAmount": { "type": "number" },
+          "fppsRatePercent": { "type": "number" },
+          "feeAmount": { "type": "number" },
+          "feeRatePercent": { "type": "number" }
+        },
+        "required": [
+          "endTime",
+          "feeAmount",
+          "feeRatePercent",
+          "fppsRatePercent",
+          "hashrate",
+          "ppsBaseAmount",
+          "startTime",
+          "totalAmount",
+          "txFeeRewardAmount"
+        ]
+      },
+      "CumulativeSubAccountStats": {
+        "type": "object",
+        "properties": {
+          "activeWorkers": { "type": "integer", "format": "int32" },
+          "offline15MinWorkerCount": { "type": "integer", "format": "int32" },
+          "offline24HrWorkerCount": { "type": "integer", "format": "int32" },
+          "hashrate5minAvg": { "type": "integer", "format": "int64" },
+          "hashrate15minAvg": { "type": "integer", "format": "int64" },
+          "stale15minAvg": { "type": "integer", "format": "int64" },
+          "reject15minAvg": { "type": "integer", "format": "int64" },
+          "hashrate1hrAvg": { "type": "integer", "format": "int64" },
+          "hashrate24hrAvg": { "type": "integer", "format": "int64" },
+          "stale1hrAvg": { "type": "integer", "format": "int64" },
+          "reject1hrAvg": { "type": "integer", "format": "int64" },
+          "lastShareTime": { "type": "string", "format": "date-time" },
+          "updatedAt": { "type": "string", "format": "date-time" }
+        },
+        "required": [
+          "activeWorkers",
+          "hashrate15minAvg",
+          "hashrate1hrAvg",
+          "hashrate24hrAvg",
+          "hashrate5minAvg",
+          "lastShareTime",
+          "offline15MinWorkerCount",
+          "offline24HrWorkerCount",
+          "reject15minAvg",
+          "reject1hrAvg",
+          "stale15minAvg",
+          "stale1hrAvg",
+          "updatedAt"
+        ]
+      },
+      "AlertInfo": {
+        "type": "object",
+        "properties": {
+          "activeWorkers": { "type": "integer", "format": "int32" },
+          "hashrate": { "type": "integer", "format": "int64" }
+        }
+      },
+      "AlertResponse": {
+        "type": "object",
+        "properties": {
+          "alertId": { "type": "integer", "format": "int32" },
+          "hashrateThreshold": { "type": "integer", "format": "int64" },
+          "activeWorkersThreshold": { "type": "integer", "format": "int32" },
+          "emailList": { "type": "array", "items": { "type": "string" } },
+          "groupName": { "type": "string" },
+          "subAccountName": { "type": "string" },
+          "isTriggered": { "type": "boolean" },
+          "alertInfo": { "$ref": "#/components/schemas/AlertInfo" },
+          "triggered": { "type": "boolean", "writeOnly": true }
+        },
+        "required": [
+          "activeWorkersThreshold",
+          "alertId",
+          "emailList",
+          "groupName",
+          "hashrateThreshold",
+          "subAccountName"
+        ]
+      },
+      "AlertsListResponse": {
+        "type": "object",
+        "properties": {
+          "alerts": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/AlertResponse" }
+          },
+          "totalCount": { "type": "integer", "format": "int64" }
+        },
+        "required": ["alerts", "totalCount"]
+      },
+      "ActivityTypesEnumResponse": {
+        "type": "object",
+        "properties": {
+          "activityName": { "type": "string" },
+          "description": { "type": "string" }
+        },
+        "required": ["activityName", "description"]
+      },
+      "AccessToken": {
+        "type": "object",
+        "properties": {
+          "access_token": { "type": "string" },
+          "expires_in": { "type": "integer", "format": "int32" },
+          "token_type": { "type": "string" }
+        },
+        "required": ["access_token", "expires_in", "token_type"]
+      }
+    }
+  }
+}
